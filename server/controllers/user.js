@@ -132,10 +132,18 @@ module.exports = function (app, router) {
   // Delete a shared bookmark with a friend
   router.route('/:actionUserId/friends/:friendId/bookmarks')
     .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      Service.Bookmark.getUserBookmarks(req.params.actionUserId, req.params.friendId).then(function (bookmarks) {
+        res.status(200).json({ status: 200, data: bookmarks });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .post(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      Service.Bookmark.createUserBookmark(req.params.actionUserId, req.params.friendId, req.body).then(function (bookmark) {
+        res.status(201).json({ status: 201, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
   // Get a particular bookmark shared with a particular friend

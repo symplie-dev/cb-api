@@ -51,6 +51,7 @@ module.exports = function (app) {
     deletedAt:    type.date()
                       .default(null)
                       .allowNull(true)
+                      .required()
   }, {
     init: false,
     enforce_extra: 'remove'
@@ -74,7 +75,13 @@ module.exports = function (app) {
       secondaryIndexes: [
         'GroupId',
         'SenderId',
-        'ReceiverId'
+        'ReceiverId',
+        [
+          'userToUser',
+          function (doc) {
+            return [doc('SenderId'), doc('ReceiverId')];
+          }
+        ]
       ]
     }
   });

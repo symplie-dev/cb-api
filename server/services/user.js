@@ -100,7 +100,7 @@ module.exports = function (app) {
    * @return {Promise<User>} The newly created user
    */
   Service.createFriendship = function (requesterId, requestedId) {
-    return _validateFriendshipRequest(requesterId, requestedId).then(function () {
+    return Service.validateFriendshipRequest(requesterId, requestedId).then(function () {
       return Model.Friendship.save({
         RequesterId: requesterId,
         RequestedId: requestedId
@@ -154,24 +154,6 @@ module.exports = function (app) {
   };
 
   /**
-   * Create a usuer-to-user bookmark.
-   * 
-   * @param {String} senderId The creater/sender of the bookmark
-   * @param {String} receieverId The receiver of the bookmark
-   * @param {Object} bookmark The bookmark being shared
-   */
-  Service.createUserBookmark = function (senderId, receiverId, bookmark) {
-    return _validateFriendship(senderId, receiverId, 'accepted').then(function () {
-      bookmark.SenderId = senderId;
-      bookmark.receiverId = receiverId;
-      delete bookmark.createdAt;
-      delete bookmark.deletedAt;
-      delete bookmark.id;
-      return Model.Bookmark.save(bookmark);
-    });
-  };
-
-  /**
    * Ensure the rules of a friendship are followed.
    * 
    * - No duplicate friendships (including inverse)
@@ -183,7 +165,7 @@ module.exports = function (app) {
    * @param {String} requestedId The id the requested user
    * @return {Promise<null>} Return an empty promise on completed validation
    */
-  function _validateFriendshipRequest(requesterId, requestedId) {
+  Service.validateFriendshipRequest = function (requesterId, requestedId) {
     if (requestedId !== requesterId) {
       return q.all([
         Model.User.getAll(requesterId).filter({ deletedAt: null }),
@@ -231,7 +213,7 @@ module.exports = function (app) {
     } else {
       return q.reject(new Errors.Http.BadRequest('ERROR: Friendship not found'));
     }
-  }
+  };
 
   /**
    * Check to see if the friendship exists and is in the desired state.
@@ -241,7 +223,7 @@ module.exports = function (app) {
    * @param  {String} [status] Optional status defaults to 'accepted'
    * @return {Promise<Object>} Return the friendship if its valid
    */
-  function _validateFriendship(aUserId, bUserId, status) {
+  Service.validateFriendship = function (aUserId, bUserId, status) {
     if (typeof status === 'undefined') {
       status = 'accepted';
     }
@@ -265,7 +247,7 @@ module.exports = function (app) {
         return q.reject(new Errors.Db.EntityNotFound('Friendship not found'));
       }
     });
-  }
+  };
 
   return q({
     name: 'User',
