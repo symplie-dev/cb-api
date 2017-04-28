@@ -1,5 +1,12 @@
 # collaborative-bookmarks-api
-Server-side api for collaborative bookmarks
+
+Server-side API for collaborative bookmarks.
+
+## Description
+
+Collaborative Bookmarks or CB for short allows users to create and manage
+lists of shared bookmarks. CB bookmarks can be shared directly user-to-user or
+shared with a group of other users.
 
 ### Environment Variables
 
@@ -16,3 +23,29 @@ Server-side api for collaborative bookmarks
 | `OAUTH_CLIENT_SECRET` | The oauth secret key          | _none_      |
 | `NODE_LOG_LEVEL`      | Verbosity level for node logs | `verbose`   |
 | `HTTP_LOG_LEVEL`      | Verbosity level for http logs | `verbose`   |
+
+### Installation
+
+##### Install and run RethinkDB
+
+1. Go to the RethinkDB installation [page][0] and install RethinkDB for your
+  platform.
+2. Start your local instance of rethink: `rethinkdb` or `rethinkdb.exe` on
+  Windows
+
+##### Install cb-api
+
+_Note: This assumes you have node v4.x or higher installed_
+
+1. Clone the repository `git clone git@github.com:symplie-dev/collaborative-bookmarks-api.git`
+2. Install NPM dependencies: `npm install`
+3. Start the API server: `npm start`
+
+##### Run test suite
+
+1. Install Postman `https://www.getpostman.com/docs/introduction`
+2. Import the Postman test harness located at `tests/postman.json`
+3. In Postman go to the newly imported collection and click `run` and then `atart`
+
+
+[0](https://rethinkdb.com/docs/install/)
