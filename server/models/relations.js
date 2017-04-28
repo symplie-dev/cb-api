@@ -9,4 +9,7 @@ module.exports = function (app) {
   Model.User.hasMany(Model.Friendship, 'friendships', 'FriendshipId', 'id', { init: false });
   Model.Friendship.hasOne(Model.User, 'requester', 'RequesterId', 'id', { init: false });
   Model.Friendship.hasOne(Model.User, 'requested', 'RequestedId',  'id', { init: false });
+
+  Model.Bookmark.belongsTo(Model.User, 'sender', 'SenderId', 'id', { init: false });
+  Model.Bookmark.belongsTo(Model.User, 'receiver', 'ReceiverId', 'id', { init: false });
 };

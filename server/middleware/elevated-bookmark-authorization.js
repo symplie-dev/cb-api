@@ -12,8 +12,8 @@ module.exports = function (app) {
       Model  = app.get('Model');
 
   /**
-   * Generic authorization middleware that ensures the user initiating the
-   * action on a particulaar resource allowed to do so.
+   * Authorization middleware to check that the user initiating the action on
+   * a given bookmark is the creater of the bookmark.
    * 
    * @param {HttpRequest} req 
    * @param {HttpResponse} res 
@@ -21,6 +21,7 @@ module.exports = function (app) {
    */
   return function (req, res, next) {
     var actionUserId = req.params.actionUserId,
+        bookmarkId = req.params.bookmarkId,
         actualSub = req.headers['x-cb-sub'],
         reqIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -31,23 +32,16 @@ module.exports = function (app) {
         data: { message: HttpErrors.Const.NotAuthorized.MESSAGE }
       });
     } else {
-      Model.User.getAll(actionUserId).filter({ deletedAt: null }).then(function (user) {
-        user = user[0];
-        if (user && user.sub === req.headers['x-cb-sub']) {
+      Model.Bookmark.get(bookmarkId).then(function (bookmark) {
+        if (bookmark.SenderId === actionUserId) {
           next();
         } else {
-          Logger.error('%s - %s requesting action for user %s', reqIp, actualSub, (user || {}).sub);
+          Logger.error('%s - %s attempted to delete unowned bookmark %s', reqIp, actionUserId, bookmarkId);
           res.status(HttpErrors.Const.NotAuthorized.STATUS).json({
             status: HttpErrors.Const.NotAuthorized.STATUS,
-            data: { message: HttpErrors.Const.NotAuthorized.MESSAGE }
+            data: { message: 'You can only delete bookmarks that you created.' }
           });
         }
-      }).catch(function (err) { 
-        Logger.error('Unable to get actionUserId: %s', actionUserId);
-        res.status(HttpErrors.Const.NotAuthorized.STATUS).json({
-          status: HttpErrors.Const.NotAuthorized.STATUS,
-          data: { message: HttpErrors.Const.NotAuthorized.MESSAGE }
-        });
       });
     }
   };

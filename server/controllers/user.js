@@ -2,13 +2,15 @@
 
 var q = require('q'),
     authentication = require('../middleware/chrome-token-authentication'),
-    authorization = require('../middleware/chrome-token-authorization');
+    authorization = require('../middleware/chrome-token-authorization'),
+    elevatedAuthorization = require('../middleware/elevated-bookmark-authorization');
 
 module.exports = function (app, router) {
   var Service = app.get('Service');
   
   authentication = authentication(app),
   authorization = authorization(app);
+  elevatedAuthorization = elevatedAuthorization(app);
 
   // Add auth middleware
   router.route('/*').all(authentication);
@@ -152,8 +154,12 @@ module.exports = function (app, router) {
     .get(function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
     })
-    .delete(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .delete(elevatedAuthorization, function (req, res) {
+      Service.Bookmark.deleteUserBookmark(req.params.bookmarkId).then(function (bookmark) {
+        res.status(200).json({ status: 200, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
   function _errorResponse(err) {

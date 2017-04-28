@@ -5,6 +5,7 @@ var q = require('q');
 module.exports = function (app) {
   var Model = app.get('Model'),
       r = app.get('Thinky').r,
+      Errors = app.get('Errors'),
       Service = {};
 
   /**
@@ -64,7 +65,24 @@ module.exports = function (app) {
    * @param {String} bookmarkId The bookmark to delete
    */
   Service.deleteUserBookmark = function (bookmarkId) {
+    var bookmark;
 
+    return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
+      sender: true,
+      receiver: true
+    }).then(function (b) {
+      bookmark = b[0];
+
+      if (bookmark) {
+        return Model.Bookmark.get(bookmarkId).update({ deletedAt: r.now() });
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
+      }
+    }).then(function () {
+      delete bookmark.sender.sub;
+      delete bookmark.receiver.sub;
+      return bookmark;
+    });
   };
 
   return q({

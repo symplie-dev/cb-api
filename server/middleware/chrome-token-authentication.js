@@ -10,7 +10,7 @@ var q = require('q'),
 
 module.exports = function (app) {
   /**
-   * Express middleware to validate a Chrome identithy token.
+   * Express middleware to validate a Chrome identity token.
    * 
    * @param {HttpRequest} req 
    * @param {HttpResponse} res 

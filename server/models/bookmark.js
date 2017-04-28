@@ -51,7 +51,6 @@ module.exports = function (app) {
     deletedAt:    type.date()
                       .default(null)
                       .allowNull(true)
-                      .required()
   }, {
     init: false,
     enforce_extra: 'remove'

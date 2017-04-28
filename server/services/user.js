@@ -79,8 +79,11 @@ module.exports = function (app) {
 
       if (user) {
         return q.all([
+          // Delete all friendships the user is part of
           Model.Friendship.getAll(userId, { index: 'RequesterId' }).update({ deletedAt: r.now() }),
           Model.Friendship.getAll(userId, { index: 'RequestedId' }).update({ deletedAt: r.now() }),
+          // Delete all bookmarks created by the user
+          Model.Bookmark.getAll(userId, { index: 'SenderId' }).update({ deletedAt: r.now() }),
           // TODO REMOVE GROUPS USER OWNS
           Model.User.get(userId).update({ deletedAt: r.now() })
         ]);
