@@ -82,6 +82,39 @@
 			"response": []
 		},
 		{
+			"name": "Validate token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/system/validate-token",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"token\": \"test\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Create user1",
 			"event": [
 				{
@@ -94,7 +127,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
-							"tests['username property equals username'] = res.data.username === 'test1@test.com';",
+							"tests['username property equals username'] = res.data.username === 'test1';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
 							"tests['does not contain deletedAt property'] = typeof res.data.deletedAt === 'undefined';"
 						]
@@ -109,11 +142,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test1@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"test1\"\n}"
 				},
 				"description": ""
 			},
@@ -132,7 +170,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
-							"tests['username property equals username'] = res.data.username === 'test2@test.com';",
+							"tests['username property equals username'] = res.data.username === 'test2';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
 							"tests['does not contain deletedAt property'] = typeof res.data.deletedAt === 'undefined';"
 						]
@@ -147,11 +185,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test2@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"test2\"\n}"
 				},
 				"description": ""
 			},
@@ -170,7 +213,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
-							"tests['username property equals username'] = res.data.username === 'test3@test.com';",
+							"tests['username property equals username'] = res.data.username === 'test3';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
 							"tests['does not contain deletedAt property'] = typeof res.data.deletedAt === 'undefined';"
 						]
@@ -185,11 +228,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test3@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"test3\"\n}"
 				},
 				"description": ""
 			},
@@ -208,7 +256,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
-							"tests['username property equals username'] = res.data.username === 'test4@test.com';",
+							"tests['username property equals username'] = res.data.username === 'test4';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
 							"tests['does not contain deletedAt property'] = typeof res.data.deletedAt === 'undefined';"
 						]
@@ -223,11 +271,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser4}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test4@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"test4\"\n}"
 				},
 				"description": ""
 			},
@@ -246,7 +299,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
-							"tests['username property equals username'] = res.data.username === 'test5@test.com';",
+							"tests['username property equals username'] = res.data.username === 'test5';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
 							"tests['does not contain deletedAt property'] = typeof res.data.deletedAt === 'undefined';"
 						]
@@ -261,11 +314,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test5@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"test5\"\n}"
 				},
 				"description": ""
 			},
@@ -294,11 +352,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"username\": \"test1@test.com\"\n}"
+					"raw": "{\n\t\"username\": \"randomname\"\n}"
 				},
 				"description": ""
 			},
@@ -334,6 +397,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
 						"description": ""
 					}
 				],
@@ -376,6 +444,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -416,6 +489,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
 						"description": ""
 					}
 				],
@@ -458,6 +536,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -499,6 +582,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -531,6 +619,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
 						"description": ""
 					}
 				],
@@ -565,6 +658,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -591,7 +689,7 @@
 							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
 							"tests['requestedId is correct'] = res.data.RequestedId === environment.user2Id;",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
-							"tests['contains status property'] = res.data.status === 'approved';",
+							"tests['contains status property'] = res.data.status === 'accepted';",
 							"tests['acceptedAt is not null'] = typeof res.data.acceptedAt === 'string'"
 						]
 					}
@@ -605,11 +703,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"status\": \"approved\"\n}"
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
 				},
 				"description": ""
 			},
@@ -631,7 +734,7 @@
 							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
 							"tests['requestedId is correct'] = res.data.RequestedId === environment.user3Id;",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
-							"tests['contains status property'] = res.data.status === 'approved';",
+							"tests['contains status property'] = res.data.status === 'accepted';",
 							"tests['acceptedAt is not null'] = typeof res.data.acceptedAt === 'string'"
 						]
 					}
@@ -645,11 +748,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"status\": \"approved\"\n}"
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
 				},
 				"description": ""
 			},
@@ -671,8 +779,8 @@
 							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
 							"tests['requestedId is correct'] = res.data.RequestedId === environment.user4Id;",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
-							"tests['contains status property'] = res.data.status === 'approved';",
-							"tests['rejectedAt is not null'] = typeof res.data.acceptedAt === 'string'"
+							"tests['contains status property'] = res.data.status === 'accepted';",
+							"tests['acceptedAt is not null'] = typeof res.data.acceptedAt === 'string'"
 						]
 					}
 				}
@@ -685,11 +793,16 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser4}}",
+						"description": ""
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"status\": \"approved\"\n}"
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
 				},
 				"description": ""
 			},
@@ -725,6 +838,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -758,6 +876,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
 						"description": ""
 					}
 				],
@@ -805,6 +928,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -839,6 +967,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -871,6 +1004,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
 						"description": ""
 					}
 				],
@@ -918,6 +1056,313 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create shared bookmark1 (user1,user2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idBookmark1', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains displalyText property'] = typeof res.data.displayText === 'string';",
+							"tests['contains SenderId property'] = res.data.SenderId === environment.user1Id;",
+							"tests['contains ReceiverId property'] = res.data.ReceiverId === environment.user2Id;",
+							"tests['contains GroupId property'] = res.data.GroupId === null;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains expiresAt property'] = res.data.expiresAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://google.com\",\n\t\"displayText\": \"google\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create shared bookmark2 (user1,user2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idBookmark2', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains displalyText property'] = typeof res.data.displayText === 'string';",
+							"tests['contains SenderId property'] = res.data.SenderId === environment.user1Id;",
+							"tests['contains ReceiverId property'] = res.data.ReceiverId === environment.user2Id;",
+							"tests['contains GroupId property'] = res.data.GroupId === null;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains expiresAt property'] = res.data.expiresAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://apple.com\",\n\t\"displayText\": \"apple\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create shared bookmark3 (user2,user1)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idBookmark3', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains displalyText property'] = typeof res.data.displayText === 'string';",
+							"tests['contains SenderId property'] = res.data.SenderId === environment.user2Id;",
+							"tests['contains ReceiverId property'] = res.data.ReceiverId === environment.user1Id;",
+							"tests['contains GroupId property'] = res.data.GroupId === null;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains expiresAt property'] = res.data.expiresAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/friends/{{user1Id}}/bookmarks",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://twitter.com\",\n\t\"displayText\": \"twitter\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get shared bookmarks (user1,user2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.bookmarks);",
+							"tests['contains friends property'] = res.data.bookmarks.length === 3;",
+							"tests['contains aUser property'] = typeof res.data.aUser === 'object';",
+							"tests['contains bUser property'] = typeof res.data.bUser === 'object';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete bookmark1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains bookmark'] = typeof res.data === 'object';",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains sender property'] = typeof res.data.sender === 'object';",
+							"tests['contains receiver property'] = typeof res.data.receiver === 'object';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks/{{idBookmark1}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm bookmark1 delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.bookmarks);",
+							"tests['contains friends property'] = res.data.bookmarks.length === 2;",
+							"tests['contains aUser property'] = typeof res.data.aUser === 'object';",
+							"tests['contains bUser property'] = typeof res.data.bUser === 'object';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm bookmark1 delete pt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 404;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user2Id}}/bookmarks/{{idBookmark1}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -951,6 +1396,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
 						"description": ""
 					}
 				],
@@ -986,6 +1436,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -1020,6 +1475,11 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
 					}
 				],
 				"body": {
@@ -1053,6 +1513,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser4}}",
 						"description": ""
 					}
 				],
