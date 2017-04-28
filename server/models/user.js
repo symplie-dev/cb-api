@@ -34,6 +34,10 @@ module.exports = function (app) {
     enforce_extra: 'remove'
   });
 
+  model.defineStatic('getPublicView', function () {
+    return this.without(['sub', 'deletedAt']);
+  });
+
   model.post('save', function (next) {
     delete this.deletedAt;
     next();

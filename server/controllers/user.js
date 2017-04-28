@@ -3,6 +3,7 @@
 var q = require('q'),
     authentication = require('../middleware/chrome-token-authentication'),
     authorization = require('../middleware/chrome-token-authorization'),
+    generalAuthorization = require('../middleware/general-bookmark-authorization'),
     elevatedAuthorization = require('../middleware/elevated-bookmark-authorization');
 
 module.exports = function (app, router) {
@@ -10,6 +11,7 @@ module.exports = function (app, router) {
   
   authentication = authentication(app),
   authorization = authorization(app);
+  generalAuthorization = generalAuthorization(app);
   elevatedAuthorization = elevatedAuthorization(app);
 
   // Add auth middleware
@@ -151,8 +153,12 @@ module.exports = function (app, router) {
   // Get a particular bookmark shared with a particular friend
   // Delete a particular bookmark shared with a particular friend
   router.route('/:actionUserId/friends/:friendId/bookmarks/:bookmarkId')
-    .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .get(generalAuthorization, function (req, res) {
+      Service.Bookmark.getUserBookmark(req.params.bookmarkId).then(function (bookmark) {
+        res.status(200).json({ status: 200, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .delete(elevatedAuthorization, function (req, res) {
       Service.Bookmark.deleteUserBookmark(req.params.bookmarkId).then(function (bookmark) {

@@ -58,6 +58,29 @@ module.exports = function (app) {
     });
   };
 
+  Service.getUserBookmark = function (bookmarkId) {
+    var bookmark;
+
+    return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
+      sender: {
+        _apply: function (user) { return user.getPublicView(); }
+      },
+      receiver: {
+        _apply: function (user) { return user.getPublicView(); }
+      }
+    }).then(function (b) {
+      bookmark = b[0];
+
+      if (bookmark) {
+        delete bookmark.sender.deletedAt;
+        delete bookmark.receiver.deletedAt;
+        return bookmark;
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
+      }
+    });
+  };
+
   /**
    * Delete a user-to-user bookmark. Only the creater of a bookmark can
    * delete it.
@@ -68,8 +91,12 @@ module.exports = function (app) {
     var bookmark;
 
     return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
-      sender: true,
-      receiver: true
+      sender: {
+        _apply: function (user) { return user.getPublicView(); }
+      },
+      receiver: {
+        _apply: function (user) { return user.getPublicView(); }
+      }
     }).then(function (b) {
       bookmark = b[0];
 
@@ -79,8 +106,9 @@ module.exports = function (app) {
         return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
       }
     }).then(function () {
-      delete bookmark.sender.sub;
-      delete bookmark.receiver.sub;
+      // TODO WHY DOES .without NOT WORK FOR DATES
+      delete bookmark.sender.deletedAt;
+      delete bookmark.receiver.deletedAt;
       return bookmark;
     });
   };

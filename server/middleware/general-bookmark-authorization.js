@@ -13,7 +13,7 @@ module.exports = function (app) {
 
   /**
    * Authorization middleware to check that the user initiating the action on
-   * a given bookmark is the creater of the bookmark.
+   * a given bookmark is affiliated with the bookmark.
    * 
    * @param {HttpRequest} req 
    * @param {HttpResponse} res 
@@ -32,13 +32,13 @@ module.exports = function (app) {
       });
     } else {
       Model.Bookmark.get(bookmarkId).then(function (bookmark) {
-        if (bookmark.SenderId === actionUserId) {
+        if (bookmark.SenderId === actionUserId || bookmark.ReceiverId === actionUserId) {
           next();
         } else {
-          Logger.error('%s - %s attempted to elevated action on unowned bookmark %s', reqIp, actionUserId, bookmarkId);
+          Logger.error('%s - %s attempted action on unaffiliated bookmark %s', reqIp, actionUserId, bookmarkId);
           res.status(HttpErrors.Const.NotAuthorized.STATUS).json({
             status: HttpErrors.Const.NotAuthorized.STATUS,
-            data: { message: 'This function requires you to be the creater of the bookmark in question.' }
+            data: { message: 'This function requires you to be affiliated with the bookmark in question.' }
           });
         }
       });

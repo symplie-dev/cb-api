@@ -24,7 +24,6 @@ module.exports = function (app) {
       } else {
         delete user.id;
         delete user.createdAt;
-        delete user.GroupId;
         return Model.User.save(user);
       }
     });
