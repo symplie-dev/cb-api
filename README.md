@@ -48,4 +48,5 @@ _Note: This assumes you have node v4.x or higher installed_
 3. In Postman go to the newly imported collection and click `run` and then `atart`
 
 
-[0](https://rethinkdb.com/docs/install/)
+
+[0]: https://rethinkdb.com/docs/install/
