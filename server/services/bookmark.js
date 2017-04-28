@@ -57,6 +57,16 @@ module.exports = function (app) {
     });
   };
 
+  /**
+   * Delete a user-to-user bookmark. Only the creater of a bookmark can
+   * delete it.
+   * 
+   * @param {String} bookmarkId The bookmark to delete
+   */
+  Service.deleteUserBookmark = function (bookmarkId) {
+
+  };
+
   return q({
     name: 'Bookmark',
     service: Service
