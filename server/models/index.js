@@ -24,25 +24,25 @@ module.exports = function (app) {
       var modelProvider;
 
       if (!stats.isDirectory() && jsFileRegEx.test(fh) && fh !== 'index.js'  && fh !== 'relations.js') {
-          try {
-            modelProvider = require(path.join(__dirname, fh));
+        try {
+          modelProvider = require(path.join(__dirname, fh));
 
-            modelProvider(app).then(function (modelDescription) {
-              Model[modelDescription.name] = modelDescription.model;
-              Model[modelDescription.name]._cbConfig = modelDescription.config; // Add custom config
-              logger.info('Model init success: %s', fh.split(',')[0]);
-              deferred.resolve();
-            }).catch(function (err) {
-              logger.error('Model init failure: %s', fh);
-              logger.error(e);
-              deferred.reject(err);
-            });
-
-          } catch (e) {
+          modelProvider(app).then(function (modelDescription) {
+            Model[modelDescription.name] = modelDescription.model;
+            Model[modelDescription.name]._cbConfig = modelDescription.config; // Add custom config
+            logger.info('Model init success: %s', fh.split(',')[0]);
+            deferred.resolve();
+          }).catch(function (err) {
             logger.error('Model init failure: %s', fh);
-            logger.error(e);
-            deferred.reject(e);
-          }
+            logger.error(err);
+            deferred.reject(err);
+          });
+
+        } catch (e) {
+          logger.error('Model init failure: %s', fh);
+          logger.error(e);
+          deferred.reject(e);
+        }
       } else  {
         deferred.resolve();
       }

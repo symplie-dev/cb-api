@@ -8,16 +8,17 @@ var q = require('q'),
     tokenRegExp = /^Bearer .*/;
 
 
-module.exports = function (app) {
+module.exports = function (/* app */) {
   /**
    * Express middleware to validate a Chrome identity token.
    * 
-   * @param {HttpRequest} req 
-   * @param {HttpResponse} res 
-   * @param {Function} next 
+   * @param {HttpRequest} req The request object
+   * @param {HttpResponse} res The response object
+   * @param {Function} next The next middleware function in the stack
+   * @return {undefined}
    */
   function chromeTokenAuth(req, res, next) {
-    var token = req.headers['authorization'];
+    var token = req.headers.authorization;
 
     if (token && tokenRegExp.test(token)) {
       token = token.split(' ')[1];
@@ -37,7 +38,7 @@ module.exports = function (app) {
         data: { message: 'Not authorized. Bearer identity token required.' }
       });
     }
-  };
+  }
 
   // TODO USE GOOGLE NPM AUTH MODULE FOR VALIDATION WITHOUT A REMOTE CALL
   function _validateToken(token) {

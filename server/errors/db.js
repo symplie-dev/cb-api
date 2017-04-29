@@ -1,7 +1,6 @@
 'use strict';
 
-var util = require('util'),
-    errors = {},
+var errors = {},
     HttpError = require('./http');
 
 errors.EntityExists = function CustomError(message) {

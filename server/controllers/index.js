@@ -21,25 +21,25 @@ module.exports = function (app) {
       var ctrlProvider;
 
       if (!stats.isDirectory() && fh !== 'index.js' && jsFileRegEx.test(fh)) {
-          try {
-            ctrlProvider = require(path.join(__dirname, fh));
+        try {
+          ctrlProvider = require(path.join(__dirname, fh));
 
-            ctrlProvider(app, Express.Router()).then(function (ctrlDescription) {
-              // Service[ctrlDescription.name] = ctrlDescription.service;
-              app.use(ctrlDescription.path, ctrlDescription.router);
-              logger.info('Controller init success: %s', fh.split('.')[0]);
-              deferred.resolve();
-            }).catch(function (err) {
-              logger.error('Controller init failure: %s', fh);
-              logger.error(e);
-              deferred.reject(err);
-            });
+          ctrlProvider(app, new Express.Router()).then(function (ctrlDescription) {
+            // Service[ctrlDescription.name] = ctrlDescription.service;
+            app.use(ctrlDescription.path, ctrlDescription.router);
+            logger.info('Controller init success: %s', fh.split('.')[0]);
+            deferred.resolve();
+          }).catch(function (err) {
+            logger.error('Controller init failure: %s', fh);
+            logger.error(err);
+            deferred.reject(err);
+          });
 
-          } catch (e) {
-            logger.error('Error loading controller: %s', fh);
-            logger.error(e);
-            deferred.reject(e);
-          }
+        } catch (e) {
+          logger.error('Error loading controller: %s', fh);
+          logger.error(e);
+          deferred.reject(e);
+        }
       } else  {
         deferred.resolve();
       }

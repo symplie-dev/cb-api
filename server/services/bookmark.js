@@ -12,8 +12,9 @@ module.exports = function (app) {
    * Create a user-to-user bookmark.
    * 
    * @param {String} senderId The creater/sender of the bookmark
-   * @param {String} receieverId The receiver of the bookmark
+   * @param {String} receiverId The receiver of the bookmark
    * @param {Object} bookmark The bookmark being shared
+   * @return {undefined}
    */
   Service.createUserBookmark = function (senderId, receiverId, bookmark) {
     return app.get('Service').User.validateFriendship(senderId, receiverId, 'accepted').then(function () {
@@ -86,6 +87,7 @@ module.exports = function (app) {
    * delete it.
    * 
    * @param {String} bookmarkId The bookmark to delete
+   * @return {Promise<Object>} The deleted bookmark
    */
   Service.deleteUserBookmark = function (bookmarkId) {
     var bookmark;

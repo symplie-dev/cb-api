@@ -1,20 +1,18 @@
 'use strict';
+
 var app = require('express')(),
-    bodyParser = require('body-parser'),
-    winston = require('winston'),
-    morgan = require('morgan'),
-    Config = require('./server/config')();
+    bodyParser = require('body-parser');
 
 // Standard middleware config
 app.use(bodyParser.urlencoded({
-    extended: true
+  extended: true
 }));
 app.use(bodyParser.json());
 
 // Enable CORS request from extension
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 

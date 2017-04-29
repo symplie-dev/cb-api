@@ -19,6 +19,8 @@ module.exports = function (app) {
 
   /**
    * Create and return the appLogger used for logging node/app related content.
+   * 
+   * @return {Object} The app logger object
    */
   function _getAppLogger() {
     return new winston.Logger({
@@ -38,6 +40,8 @@ module.exports = function (app) {
 
   /**
    * Create and return the access appLogger
+   * 
+   * @return {Object} The access logger objects
    */
   function _getAccessLogger() {
     var al = new winston.Logger({
@@ -55,7 +59,7 @@ module.exports = function (app) {
     });
 
     al.stream = {
-      write: function(message) {
+      write: function (message) {
         if (ERR_CODE_REGEX.test(message)) {
           al.error(message.replace(ERR_CODE_REGEX, '$1').trim());
         } else {

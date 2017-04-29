@@ -33,9 +33,9 @@ module.exports = function (app) {
    * Get a particular user.
    * 
    * @param {String} userId The id of the user to get
-   * @param {Object} [opts] Options to use when fetching
+   * @return {Promise<Object>} The fetched user
    */
-  Service.get = function (userId, opts) {
+  Service.get = function (userId) {
     var user;
 
     return Model.User.getAll(userId).filter({ deletedAt: null }).then(function (u) {
@@ -47,11 +47,11 @@ module.exports = function (app) {
           Model.Friendship.getAll(userId, { index: 'RequesterId' })
             .filter(
               r.row('deletedAt').eq(null).and(r.row('status').ne('rejected'))
-            ).getJoin({ requested: true }), //.without('RequestedId', 'RequesterId'),
+            ).getJoin({ requested: true }),
           Model.Friendship.getAll(userId, { index: 'RequestedId' })
             .filter(
               r.row('deletedAt').eq(null).and(r.row('status').ne('rejected'))
-            ).getJoin({ requester: true }) //.without('RequestedId', 'RequesterId')
+            ).getJoin({ requester: true })
         ]);
       } else {
         return q.reject(new Errors.Db.EntityNotFound('User not found'));

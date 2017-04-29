@@ -1,1 +1,43 @@
-{}
+{
+  "globals": {},
+  "root": true,
+  "env": {
+    "browser": false,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended"
+  ],
+  "rules": {
+    "block-scoped-var": "error",
+    "curly": ["error", "all"],
+    "dot-location": ["error", "property"],
+    "dot-notation": "error",
+    "func-call-spacing": ["error", "never"],
+    "indent": ["error", 2, { "VariableDeclarator": 2 }],
+    "new-cap": "error",
+    "no-eval": "error",
+    "no-useless-escape": "error",
+    "one-var": ["error", "always"],
+    "one-var-declaration-per-line": ["error", "always"],
+    "operator-linebreak": ["error", "after"],
+    "object-curly-spacing": ["error", "always"],
+    "array-bracket-spacing": ["error", "never"],
+    "quotes": ["error", "single"],
+    "space-before-function-paren": ["error", { "anonymous": "always", "named": "never" }],
+    "space-unary-ops": ["error", { "words": true, "nonwords": false }],
+    "spaced-comment": ["error", "always", {
+      "line": {
+        "exceptions": ["-"]
+      },
+      "block": {
+        "exceptions": ["*"],
+        "balanced": true
+      }
+    }],
+    "strict": "error",
+    "valid-jsdoc": "error",
+    "vars-on-top": "error",
+    "yoda": "error"
+  }
+}

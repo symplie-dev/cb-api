@@ -1,23 +1,19 @@
 'use strict';
 
-var q = require('q'),
-    request = require('request'),
-    Config = require('../config')(),
-    HttpErrors = require('../errors/http'),
-    tokenRegExp = /^Bearer .*/;
+var HttpErrors = require('../errors/http');
 
 module.exports = function (app) {
-  var Config = app.get('Config'),
-      Logger = app.get('AppLogger'),
+  var Logger = app.get('AppLogger'),
       Model  = app.get('Model');
 
   /**
    * Generic authorization middleware that ensures the user initiating the
    * action on a particulaar resource allowed to do so.
    * 
-   * @param {HttpRequest} req 
-   * @param {HttpResponse} res 
-   * @param {Function} next 
+   * @param {HttpRequest} req The request object
+   * @param {HttpResponse} res The response object
+   * @param {Function} next The next middleware function in the stack
+   * @return {undefined}
    */
   return function (req, res, next) {
     var actionUserId = req.params.actionUserId,
@@ -44,6 +40,7 @@ module.exports = function (app) {
         }
       }).catch(function (err) { 
         Logger.error('Unable to get actionUserId: %s', actionUserId);
+        Logger.error(err);
         res.status(HttpErrors.Const.NotAuthorized.STATUS).json({
           status: HttpErrors.Const.NotAuthorized.STATUS,
           data: { message: HttpErrors.Const.NotAuthorized.MESSAGE }

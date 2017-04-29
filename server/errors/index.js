@@ -1,7 +1,6 @@
 'use strict';
 
-var q = require('q'),
-    fs = require('fs'),
+var fs = require('fs'),
     path = require('path'),
     util = require('util'),
     errorFiles = fs.readdirSync(__dirname),

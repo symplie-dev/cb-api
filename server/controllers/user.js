@@ -61,7 +61,7 @@ module.exports = function (app, router) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
     })
     .post(function (req, res) {
-       res.status(501).json({ status: 501, message: 'Not implemented' });
+      res.status(501).json({ status: 501, message: 'Not implemented' });
     });
   
   // Get a particular group
