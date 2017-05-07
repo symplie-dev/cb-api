@@ -1,9 +1,11 @@
 'use strict';
 
 var app = require('express')(),
-    bodyParser = require('body-parser');
+    bodyParser = require('body-parser'),
+    helmet = require('helmet');
 
 // Standard middleware config
+app.use(helmet());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
