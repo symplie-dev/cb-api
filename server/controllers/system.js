@@ -2,13 +2,13 @@
 
 var q = require('q'),
     pkg = require('../../package.json'),  
-    authentication = require('../middleware/chrome-token-authentication');
+    authenticate = require('../middleware/authenticate');
 
 module.exports = function (app, router) {
   var Service = app.get('Service'),
       Logger = app.get('AppLogger');
   
-  authentication = authentication(app);
+  authenticate = authenticate(app);
 
   router.route('/info')
     .get(function (req, res) {
@@ -43,7 +43,7 @@ module.exports = function (app, router) {
   router.route('/validate-token')
     .post(function (req, res) {
       Logger.info('Validate token: %s', req.body.token);
-      authentication._validateToken(req.body.token).then(function (tokenRes) {
+      authenticate.chrome._tokenValidate(req.body.token).then(function (tokenRes) {
         Logger.info(tokenRes);
         res.status(200).json({
           status: 200,

@@ -1,22 +1,18 @@
 'use strict';
 
 var q = require('q'),
-    authentication = require('../middleware/chrome-token-authentication'),
-    authorization = require('../middleware/chrome-token-authorization'),
-    generalAuthorization = require('../middleware/general-bookmark-authorization'),
-    elevatedAuthorization = require('../middleware/elevated-bookmark-authorization');
+    authenticate = require('../middleware/authenticate'),
+    authorize = require('../middleware/authorize');
 
 module.exports = function (app, router) {
   var Service = app.get('Service');
   
-  authentication = authentication(app),
-  authorization = authorization(app);
-  generalAuthorization = generalAuthorization(app);
-  elevatedAuthorization = elevatedAuthorization(app);
+  authenticate = authenticate(app),
+  authorize = authorize(app);
 
   // Add auth middleware
-  router.route('/*').all(authentication);
-  router.route('/:actionUserId/*').all(authorization);
+  router.route('/*').all(authenticate.chrome.user);
+  router.route('/:actionUserId/*').all(authorize.chrome.user);
 
   // Create a new user
   router.route('/')
@@ -153,14 +149,14 @@ module.exports = function (app, router) {
   // Get a particular bookmark shared with a particular friend
   // Delete a particular bookmark shared with a particular friend
   router.route('/:actionUserId/friends/:friendId/bookmarks/:bookmarkId')
-    .get(generalAuthorization, function (req, res) {
+    .get(authorize.bookmark.user, function (req, res) {
       Service.Bookmark.getUserBookmark(req.params.bookmarkId).then(function (bookmark) {
         res.status(200).json({ status: 200, data: bookmark });
       }).catch(function (err) {
         res.status(err.status || 500).json(_errorResponse(err));
       });
     })
-    .delete(elevatedAuthorization, function (req, res) {
+    .delete(authorize.bookmark.creator, function (req, res) {
       Service.Bookmark.deleteUserBookmark(req.params.bookmarkId).then(function (bookmark) {
         res.status(200).json({ status: 200, data: bookmark });
       }).catch(function (err) {
