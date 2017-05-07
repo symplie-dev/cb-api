@@ -81,15 +81,17 @@ module.exports = function (app) {
           // Delete all friendships the user is part of
           Model.Friendship.getAll(userId, { index: 'RequesterId' }).update({ deletedAt: r.now() }),
           Model.Friendship.getAll(userId, { index: 'RequestedId' }).update({ deletedAt: r.now() }),
-          // Delete all bookmarks created by the user
+          // Delete all bookmarks created by the user or received by the user
           Model.Bookmark.getAll(userId, { index: 'SenderId' }).update({ deletedAt: r.now() }),
+          Model.Bookmark.getAll(userId, { index: 'ReceiverId' }).update({ deletedAt: r.now() }),
           // TODO REMOVE GROUPS USER OWNS
+          // Delete the user record itself
           Model.User.get(userId).update({ deletedAt: r.now() })
         ]);
       } else {
         return q.reject(new Errors.Db.EntityNotFound('User not found'));
       }
-    }).then(function (re) {
+    }).then(function () {
       return user;
     });
   };
@@ -98,7 +100,8 @@ module.exports = function (app) {
    * Create a new friendship. Friendships must be accepted before they are
    * respected. TODO: Make safer.
    * 
-   * @param {Object} user The new user to be created
+   * @param {String} requesterId The user requesting the friendship
+   * @param {String} requestedId The user being requested
    * @return {Promise<User>} The newly created user
    */
   Service.createFriendship = function (requesterId, requestedId) {
