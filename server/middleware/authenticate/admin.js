@@ -13,9 +13,9 @@ module.exports = function (app) {
  
       if (!credentials || credentials.name !== Config.admin.USER || credentials.pass !== Config.admin.PASS) {
         Logger.warn('%s attempted unauthenticated admin request', reqIp);
-        res.statusCode = 401
-        res.setHeader('WWW-Authenticate', 'Basic realm="example"')
-        res.end('Access denied')
+        res.statusCode = 401;
+        res.setHeader('WWW-Authenticate', 'Basic');
+        res.end('Access denied');
       } else {
         Logger.info('%s successfully authenticated for admin', reqIp);
         next();
