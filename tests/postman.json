@@ -598,6 +598,52 @@
 			"response": []
 		},
 		{
+			"name": "Create friendship6 (user2,user5)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains requesterId property'] = typeof res.data.RequesterId === 'string';",
+							"tests['requesterId equals user1Id'] = res.data.RequesterId === environment.user2Id;",
+							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
+							"tests['requestedId equals user2Id'] = res.data.RequestedId === environment.user5Id;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains status property'] = res.data.status === 'pending';",
+							"tests['contains acceptedAt property'] = res.data.acceptedAt === null;",
+							"tests['contains rejectedAt property'] = res.data.rejectedAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/friends/{{user5Id}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Attempt recreate friendship1 inverse",
 			"event": [
 				{
@@ -809,6 +855,51 @@
 			"response": []
 		},
 		{
+			"name": "Accept friendship4 (user5,user1)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains requesterId property'] = typeof res.data.RequesterId === 'string';",
+							"tests['requesterId is correct'] = res.data.RequesterId === environment.user5Id;",
+							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
+							"tests['requestedId is correct'] = res.data.RequestedId === environment.user1Id;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains status property'] = res.data.status === 'accepted';",
+							"tests['rejectedAt is not null'] = res.data.rejectedAt === null"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user5Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Reject friendship5 (user2,user3)",
 			"event": [
 				{
@@ -848,6 +939,51 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Accept friendship6 (user2,user5)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains requesterId property'] = typeof res.data.RequesterId === 'string';",
+							"tests['requesterId is correct'] = res.data.RequesterId === environment.user2Id;",
+							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
+							"tests['requestedId is correct'] = res.data.RequestedId === environment.user5Id;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains status property'] = res.data.status === 'accepted';",
+							"tests['rejectedAt is not null'] = res.data.rejectedAt === null"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user5Id}}/friends/{{user2Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
 				},
 				"description": ""
 			},
@@ -916,134 +1052,6 @@
 							"tests['contains friend user5'] = res.data.filter(function (friend) {",
 							"    return (friend.requester || {}).id === environment.user5Id;",
 							"}).length === 1;"
-						]
-					}
-				}
-			],
-			"request": {
-				"url": "localhost:3000/api/users/{{user1Id}}/friends",
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{tokenUser1}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"status\": \"rejected\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Delete user5",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"var res = JSON.parse(responseBody);",
-							"",
-							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['contains user1Id'] = res.data.id === environment.user5Id;"
-						]
-					}
-				}
-			],
-			"request": {
-				"url": "localhost:3000/api/users/{{user5Id}}",
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{tokenUser5}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"status\": \"rejected\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Confirm user5 delete",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"var res = JSON.parse(responseBody);",
-							"",
-							"tests['proper response code'] = responseCode.code === 404;"
-						]
-					}
-				}
-			],
-			"request": {
-				"url": "localhost:3000/api/users/{{user5Id}}",
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{tokenUser5}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"status\": \"rejected\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Confirm user5 friendship removed",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"var res = JSON.parse(responseBody);",
-							"",
-							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['contains friends property'] = Array.isArray(res.data);",
-							"tests['contains friend user2'] = res.data.filter(function (friend) {",
-							"    return (friend.requested || {}).id === environment.user2Id;",
-							"}).length === 1;",
-							"tests['contains friend user3'] = res.data.filter(function (friend) {",
-							"    return (friend.requested || {}).id === environment.user3Id;",
-							"}).length === 1;",
-							"tests['contains friend user4'] = res.data.filter(function (friend) {",
-							"    return (friend.requested || {}).id=== environment.user4Id;",
-							"}).length === 1;",
-							"tests['does not contain friend user5'] = res.data.filter(function (friend) {",
-							"    return (friend.requester || {}).id === environment.user5Id;",
-							"}).length === 0;"
 						]
 					}
 				}
@@ -1210,6 +1218,98 @@
 			"response": []
 		},
 		{
+			"name": "Create shared bookmark4 (user5,user1)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idBookmark3', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains displalyText property'] = typeof res.data.displayText === 'string';",
+							"tests['contains SenderId property'] = res.data.SenderId === environment.user5Id;",
+							"tests['contains ReceiverId property'] = res.data.ReceiverId === environment.user1Id;",
+							"tests['contains GroupId property'] = res.data.GroupId === null;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains expiresAt property'] = res.data.expiresAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user5Id}}/friends/{{user1Id}}/bookmarks",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://twitter.com\",\n\t\"displayText\": \"twitter\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create shared bookmark5 (user2,user5)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idBookmark3', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains url property'] = typeof res.data.url === 'string';",
+							"tests['contains displalyText property'] = typeof res.data.displayText === 'string';",
+							"tests['contains SenderId property'] = res.data.SenderId === environment.user2Id;",
+							"tests['contains ReceiverId property'] = res.data.ReceiverId === environment.user5Id;",
+							"tests['contains GroupId property'] = res.data.GroupId === null;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains expiresAt property'] = res.data.expiresAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/friends/{{user5Id}}/bookmarks",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"url\": \"https://twitter.com\",\n\t\"displayText\": \"twitter\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Get shared bookmarks (user1,user2)",
 			"event": [
 				{
@@ -1220,10 +1320,10 @@
 							"var res = JSON.parse(responseBody);",
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['contains friends property'] = Array.isArray(res.data.bookmarks);",
-							"tests['contains friends property'] = res.data.bookmarks.length === 3;",
-							"tests['contains aUser property'] = typeof res.data.aUser === 'object';",
-							"tests['contains bUser property'] = typeof res.data.bUser === 'object';"
+							"tests['contains bookmarks property'] = Array.isArray(res.data.bookmarks);",
+							"tests['contains 3 bookmarks'] = res.data.bookmarks.length === 3;",
+							"tests['contains self property'] = typeof res.data.self === 'object';",
+							"tests['contains friends property'] = typeof res.data.friend === 'object';"
 						]
 					}
 				}
@@ -1304,10 +1404,10 @@
 							"var res = JSON.parse(responseBody);",
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['contains friends property'] = Array.isArray(res.data.bookmarks);",
-							"tests['contains friends property'] = res.data.bookmarks.length === 2;",
-							"tests['contains aUser property'] = typeof res.data.aUser === 'object';",
-							"tests['contains bUser property'] = typeof res.data.bUser === 'object';"
+							"tests['contains bookmarks property'] = Array.isArray(res.data.bookmarks);",
+							"tests['contains 2 bookmarks'] = res.data.bookmarks.length === 2;",
+							"tests['contains self property'] = typeof res.data.self === 'object';",
+							"tests['contains friend property'] = typeof res.data.friend === 'object';"
 						]
 					}
 				}
@@ -1362,6 +1462,210 @@
 					{
 						"key": "Authorization",
 						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user5",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains user1Id'] = res.data.id === environment.user5Id;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user5Id}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user5 delete",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 404;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user5Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser5}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user5 friendship removed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data);",
+							"tests['contains friend user2'] = res.data.filter(function (friend) {",
+							"    return (friend.requested || {}).id === environment.user2Id;",
+							"}).length === 1;",
+							"tests['contains friend user3'] = res.data.filter(function (friend) {",
+							"    return (friend.requested || {}).id === environment.user3Id;",
+							"}).length === 1;",
+							"tests['contains friend user4'] = res.data.filter(function (friend) {",
+							"    return (friend.requested || {}).id=== environment.user4Id;",
+							"}).length === 1;",
+							"tests['does not contain friend user5'] = res.data.filter(function (friend) {",
+							"    return (friend.requester || {}).id === environment.user5Id;",
+							"}).length === 0;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user5 Bookmark4 removed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 404;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/friends/{{user5Id}}/bookmarks",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user5 Bookmark5 removed",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 404;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/friends/{{user5Id}}/bookmarks",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
 						"description": ""
 					}
 				],
