@@ -9,7 +9,7 @@ module.exports = function (app) {
   return {
     /**
      * Generic authorization middleware that ensures the user initiating the
-     * action on a particulaar resource allowed to do so.
+     * action on a particulaar resource is allowed to do so.
      * 
      * @param {HttpRequest} req The request object
      * @param {HttpResponse} res The response object
