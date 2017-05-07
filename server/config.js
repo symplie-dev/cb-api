@@ -29,8 +29,8 @@ module.exports = function () {
       CLIENT_SECRET: process.env.OAUTH_CLIENT_SECRET
     },
     admin: {
-      USER: process.env.ADMIN_USER,
-      PASS: process.env.ADMIN_PASS
+      USER: process.env.ADMIN_USER || 'postman',
+      PASS: process.env.ADMIN_PASS || 'test'
     }
   };
 

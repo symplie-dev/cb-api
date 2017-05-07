@@ -6,9 +6,8 @@ module.exports = function (app) {
   // Initialize loggers
   require('./logger')(app);
   // Check admin credentials provided
-  if (!app.get('Config').admin.USER || !app.get('Config').admin.PASS) {
-    app.get('AppLogger').error('You must provide ADMIN_USER and ADMIN_PASS environment variables. Exiting..');
-    process.exit(1);
+  if (app.get('Config').admin.USER === 'postman' || app.get('Config').admin.PASS === 'test') {
+    app.get('AppLogger').warn('Using test admin credentials; ADMIN_USER, ADMIN_USER should be set explicitly in production.');
   }
   // Initialize custom errors
   app.set('Errors', require('./errors')(app));

@@ -23,8 +23,8 @@ shared with a group of other users.
 | `OAUTH_CLIENT_SECRET` | The oauth secret key          | _none_      |
 | `NODE_LOG_LEVEL`      | Verbosity level for node logs | `verbose`   |
 | `HTTP_LOG_LEVEL`      | Verbosity level for http logs | `verbose`   |
-| `ADMIN_USER`          | The admin username            | _none_      |
-| `ADMIN_PASS`          | The admin password            | _none_      |
+| `ADMIN_USER`          | The admin username            | `postman`   |
+| `ADMIN_PASS`          | The admin password            | `test`      |
 
 ### Installation
 
@@ -41,15 +41,13 @@ _Note: This assumes you have node v4.x or higher installed_
 
 1. Clone the repository `git clone git@github.com:symplie-dev/collaborative-bookmarks-api.git`
 2. Install NPM dependencies: `npm install`
-3. Add the `ADMIN_USER` and `ADMIN_PASS` environment variables
-    - Postman tests expect: user: `postman`, pass: `test`
-4. Start the API server: `npm start`
+3. Start the API server: `npm start`
 
 ### Testing
 
 ##### End-to-End
 
-1. Ensure RethinkDB and cb-api server are running (detailed above)
+1. Ensure RethinkDB and the cb-api server are running (detailed above)
 2. Install Postman `https://www.getpostman.com/docs/introduction`
 3. Import the Postman test harness located at `tests/postman.json`
 4. In Postman go to the newly imported collection and click `run` and then `start`
