@@ -17,6 +17,16 @@ module.exports = function (app) {
     });
   };
 
+  thisService.createDb = function () {
+    return r.dbList().then(function (dbList) {
+      if (dbList.indexOf(Config.db.NAME) < 0) {
+        return r.dbCreate(Config.db.NAME);
+      } else {
+        return q();
+      }
+    });
+  };
+
   /**
    * Create all tables represented by Models. Only create the tables if they
    * don't already exist.
@@ -35,9 +45,6 @@ module.exports = function (app) {
       });
       
       return q.all(createPrms);
-    }).then(function () {
-      Model.initRelations(app);
-      return null;
     });
   };
 
@@ -76,7 +83,9 @@ module.exports = function (app) {
    * @return {Promise<undefined>} Resolve an empty promise on completion
    */
   thisService.initDb = function () {
-    return thisService.createTables().then(function () {
+    return thisService.createDb().then(function () {
+      return thisService.createTables();
+    }).then(function () {
       thisService.ensureSecondaryIndexes();
     });
   };

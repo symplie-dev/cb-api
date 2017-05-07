@@ -34,8 +34,12 @@ module.exports = function () {
     }
   };
 
-  // Add derived properties
-  Config.db.CONN_OPTS = { db: Config.db.NAME, servers: Config.db.SERVERS };
+  // Create Thinky connection config
+  Config.db.CONN_OPTS = {
+    db: Config.db.NAME, 
+    servers: Config.db.SERVERS,
+    createDatabase: false
+  };
 
   if (Config.db.KEY && Config.db.CERT) {
     Config.db.CONN_OPTS.ssl = { key: Config.db.KEY, cert: Config.db.CERT };

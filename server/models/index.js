@@ -49,15 +49,11 @@ module.exports = function (app) {
     });
   });
 
-  // Expose function to initialize relationships
-  // We cannot call this at start up because hasAndBelongsToMany joiner table
-  // is automatically created; if it runs at startup RethinkDB will attempt to
-  // create the joiner table for every instance of node
-  Model.initRelations = require('./relations');
-
   // Resolve when all models have resolved
   return q.all(modelPrms).then(function () {
     app.set('Model', Model);
+    return require('./relations')(app);
+  }).then(function () {
     return q();
   }).catch(function (err) {
     return q.reject(err);
