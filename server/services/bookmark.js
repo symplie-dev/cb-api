@@ -31,31 +31,38 @@ module.exports = function (app) {
   /**
    * Get all bookmarks shared between two users.
    * 
-   * @param {String} aUserId User with shared bookmarks
-   * @param {String} bUserId User with shared bookmarks
+   * @param {String} selfUser User id fetching the bookmarks
+   * @param {String} friendUser User id with shared bookmarks
    * @return {Promise<Array<Object>>} List of shared bookmarks
    */
-  Service.getUserBookmarks = function (aUserId, bUserId) {
+  Service.getUserBookmarks = function (selfUser, friendUser) {
     return q.all([
-      Model.User.get(aUserId),
-      Model.User.get(bUserId),
+      Model.User.getAll(selfUser).filter({ deletedAt: null }),
+      Model.User.getAll(friendUser).filter({ deletedAt: null }),
       r.table(Model.Bookmark.getTableName()).getAll(
-        [aUserId, bUserId],
+        [selfUser, friendUser],
         { index: 'userToUser' }
       ).filter({ deletedAt: null }),
       r.table(Model.Bookmark.getTableName()).getAll(
-        [bUserId, aUserId],
+        [friendUser, selfUser],
         { index: 'userToUser' }
       ).filter({ deletedAt: null })
     ]).then(function (res) {
-      // Don't leak chrome identity ids
-      delete res[0].sub;
-      delete res[1].sub;
-      return {
-        aUser: res[0],
-        bUser: res[1],
-        bookmarks: res[2].concat(res[3])
-      };
+      res[0] = res[0][0];
+      res[1] = res[1][0];
+      
+      if (!res[0] || !res[1]) {
+        return q.reject(new Errors.Db.EntityNotFound('User not found. Unable to retrieve bookmarks'));
+      } else {
+        // Don't leak chrome identity ids
+        delete res[0].sub;
+        delete res[1].sub;
+        return {
+          self: res[0],
+          friend: res[1],
+          bookmarks: res[2].concat(res[3])
+        };
+      }
     });
   };
 
