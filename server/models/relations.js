@@ -3,8 +3,8 @@
 module.exports = function (app) {
   var Model = app.get('Model');
 
-  Model.Group.hasAndBelongsToMany(Model.User, 'members', 'id', 'username', { init: false });
-  Model.User.hasAndBelongsToMany(Model.Group, 'groups', 'username', 'id', { init: false });
+  Model.Group.hasAndBelongsToMany(Model.User, 'members', 'id', 'username');
+  Model.User.hasAndBelongsToMany(Model.Group, 'groups', 'username', 'id');
 
   Model.User.hasMany(Model.Friendship, 'friendships', 'FriendshipId', 'id', { init: false });
   Model.Friendship.hasOne(Model.User, 'requester', 'RequesterId', 'id', { init: false });

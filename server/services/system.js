@@ -35,6 +35,9 @@ module.exports = function (app) {
       });
       
       return q.all(createPrms);
+    }).then(function () {
+      Model.initRelations(app);
+      return null;
     });
   };
 
