@@ -23,14 +23,14 @@ module.exports = function (app, router) {
     });
 
   router.route('/database')
-    .get(function (req, res) {
+    .get(authenticate.admin.user, function (req, res) {
       Service.System.getDbConfig().then(function (c) {
         res.status(200).json({ status: 200, data: c });
       }).catch(function (err) {
         res.status(err.status).json(err);
       });
     })
-    .post(function (req, res) {
+    .post(authenticate.admin.user, function (req, res) {
       Service.System.initDb().then(function () {
         return Service.System.getDbConfig();
       }).then(function (c) {
@@ -41,7 +41,7 @@ module.exports = function (app, router) {
     });
     
   router.route('/validate-token')
-    .post(function (req, res) {
+    .post(authenticate.admin.user, function (req, res) {
       Logger.info('Validate token: %s', req.body.token);
       authenticate.chrome._tokenValidate(req.body.token).then(function (tokenRes) {
         Logger.info(tokenRes);

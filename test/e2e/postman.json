@@ -27,6 +27,15 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "postman",
+						"password": "test",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
 				"url": "localhost:3000/api/system/database",
 				"method": "POST",
 				"header": [
@@ -34,12 +43,14 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic cG9zdG1hbjp0ZXN0",
+						"description": ""
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -64,6 +75,15 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "postman",
+						"password": "test",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
 				"url": "localhost:3000/api/system/database",
 				"method": "GET",
 				"header": [
@@ -71,12 +91,14 @@
 						"key": "Content-Type",
 						"value": "application/json",
 						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic cG9zdG1hbjp0ZXN0",
+						"description": ""
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
+				"body": {},
 				"description": ""
 			},
 			"response": []
@@ -97,12 +119,26 @@
 				}
 			],
 			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": {
+						"username": "postman",
+						"password": "test",
+						"saveHelperData": true,
+						"showPassword": false
+					}
+				},
 				"url": "localhost:3000/api/system/validate-token",
 				"method": "POST",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic cG9zdG1hbjp0ZXN0",
 						"description": ""
 					}
 				],

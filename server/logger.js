@@ -16,6 +16,7 @@ module.exports = function (app) {
 
   app.set('AppLogger', appLogger);
   app.set('AccessLogger', accessLogger);
+  app.set('AuthLogger', _getAuthLogger());
 
   /**
    * Create and return the appLogger used for logging node/app related content.
@@ -32,6 +33,27 @@ module.exports = function (app) {
           colorize: true,
           timestamp: true,
           label: 'app'
+        })
+      ],
+      exitOnError: false
+    });
+  }
+
+  /**
+   * Create and return the authLogger used for logging auth middleware info.
+   * 
+   * @return {Object} The app logger object
+   */
+  function _getAuthLogger() {
+    return new winston.Logger({
+      transports: [
+        new winston.transports.Console({
+          level: Config.log.NODE_LEVEL,
+          handleExceptions: true,
+          json: false,
+          colorize: true,
+          timestamp: true,
+          label: 'auth'
         })
       ],
       exitOnError: false

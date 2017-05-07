@@ -5,12 +5,14 @@ var HttpErrors = require('../../errors/http'),
     tokenRegExp = /^Bearer .*/;
 
 module.exports = function (app) {
-  var Logger = app.get('AppLogger');
+  var Logger = app.get('AuthLogger');
   
   return {
     /**
-     * Generic authorization middleware that ensures the user initiating the
-     * action on a particulaar resource allowed to do so.
+     * Chrome identity-specific authentication middleware to ensure the given
+     * bearer token is a valid Chrome identity token. It adds the chrome user
+     * ID to the req object ['x-cb-sub'] for use later in the express
+     * middleware stack.
      * 
      * @param {HttpRequest} req The request object
      * @param {HttpResponse} res The response object

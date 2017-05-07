@@ -3,7 +3,7 @@
 var HttpErrors = require('../../errors/http');
 
 module.exports = function (app) {
-  var Logger = app.get('AppLogger'),
+  var Logger = app.get('AuthLogger'),
       Model  = app.get('Model');
 
   return {
