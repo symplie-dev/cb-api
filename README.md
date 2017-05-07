@@ -41,11 +41,18 @@ _Note: This assumes you have node v4.x or higher installed_
 2. Install NPM dependencies: `npm install`
 3. Start the API server: `npm start`
 
-##### Run test suite
+### Testing
 
-1. Install Postman `https://www.getpostman.com/docs/introduction`
-2. Import the Postman test harness located at `tests/postman.json`
-3. In Postman go to the newly imported collection and click `run` and then `atart`
+##### End-to-End
+
+1. Ensure RethinkDB and cb-api server are running (detailed above)
+2. Install Postman `https://www.getpostman.com/docs/introduction`
+3. Import the Postman test harness located at `tests/postman.json`
+4. In Postman go to the newly imported collection and click `run` and then `start`
+
+##### Unit
+
+`TODO`
 
 
 
