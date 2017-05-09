@@ -22,7 +22,10 @@ module.exports = function () {
       HTTP_LEVEL: process.env.HTTP_LOG_LEVEL || 'verbose'
     },
     consts: {
-      MAX_FRIENDS: 50
+      MAX_FRIENDS: 50,
+      MAX_GROUPS: 25,
+      MAX_USER_BOOKMARKS: 100,
+      MAX_GROUP_BOOKMARKS: 100
     },
     oauth: {
       CLIENT_ID: process.env.OAUTH_CLIENT_ID,

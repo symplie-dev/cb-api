@@ -57,7 +57,12 @@ module.exports = function (app, router) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
     })
     .post(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      req.body.CreatorId = req.params.actionUserId;
+      Service.Group.create(req.body).then(function (group) {
+        res.status(201).json({ status: 201, data: group });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
   // Get a particular group
@@ -65,7 +70,11 @@ module.exports = function (app, router) {
   // Delete a paricular group
   router.route('/:actionUserId/groups/:groupId')
     .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      Service.Group.get(req.params.groupId).then(function (group) {
+        res.status(200).json({ status: 200, data: group });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .put(function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });

@@ -4,7 +4,7 @@ var q = require('q');
 
 module.exports = function (app) {
   var Thinky = app.get('Thinky'),
-      MODEL_NAME = 'User_Group',
+      MODEL_NAME = 'Group_User',
       type = Thinky.type,
       r = Thinky.r,
       model;
@@ -15,12 +15,12 @@ module.exports = function (app) {
                       .default(r.uuid())
                       .allowNull(false)
                       .required(),
-    UserId:       type.string()
+    User_id:       type.string()
                       .uuid(4)
                       .default(r.uuid())
                       .allowNull(false)
                       .required(),
-    GroupId:      type.string()
+    Group_id:      type.string()
                       .uuid(4)
                       .default(r.uuid())
                       .allowNull(false)
@@ -33,6 +33,6 @@ module.exports = function (app) {
   return q({
     name: MODEL_NAME,
     model: model,
-    config: { primaryKey: 'id', secondaryIndexes: ['UserId', 'GroupId'] }
+    config: { primaryKey: 'id', secondaryIndexes: ['User_id', 'Group_id'] }
   });
 };

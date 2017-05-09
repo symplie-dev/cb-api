@@ -10,11 +10,27 @@ module.exports = function (app) {
       model;
 
   model = Thinky.createModel(MODEL_NAME, {
-    id:           type.string()
-                      .uuid(4)
-                      .default(r.uuid())
-                      .allowNull(false)
-                      .required()
+    id:         type.string()
+                    .uuid(4)
+                    .default(r.uuid())
+                    .allowNull(false)
+                    .required(),
+    name:       type.string()
+                    .min(1)
+                    .max(128)
+                    .allowNull(false)
+                    .required(),
+    CreatorId:  type.string()
+                    .uuid(4)
+                    .allowNull(false)
+                    .required(),
+    createdAt:   type.date()
+                    .default(r.now())
+                    .allowNull(false)
+                    .required(),
+    deletedAt:   type.date()
+                    .default(null)
+                    .allowNull(true)
   }, {
     init: false,
     enforce_extra: 'remove'
@@ -23,6 +39,6 @@ module.exports = function (app) {
   return q({
     name: MODEL_NAME,
     model: model,
-    config: { primaryKey: 'id', secondaryIndexes: [] }
+    config: { primaryKey: 'id', secondaryIndexes: ['CreatorId'] }
   });
 };

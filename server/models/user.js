@@ -10,25 +10,33 @@ module.exports = function (app) {
       model;
 
   model = Thinky.createModel(MODEL_NAME, {
-    id:           type.string()
-                      .uuid(4)
-                      .default(r.uuid())
-                      .allowNull(false)
-                      .required(),
-    username:     type.string()
-                      .regex('^[a-zA-Z0-9]{1,15}$')
-                      .allowNull(false)
-                      .required(),
-    sub:          type.string()
-                      .allowNull(false)
-                      .required(),
-    createdAt:    type.date()
-                      .default(r.now())
-                      .allowNull(false)
-                      .required(),
-    deletedAt:    type.date()
-                      .default(null)
-                      .allowNull(true)
+    id:               type.string()
+                          .uuid(4)
+                          .default(r.uuid())
+                          .allowNull(false)
+                          .required(),
+    username:         type.string()
+                          .regex('^[a-zA-Z0-9]{1,15}$')
+                          .allowNull(false)
+                          .required(),
+    numFriends:       type.number()
+                          .allowNull(false)
+                          .default(0)
+                          .required(),
+    numGroupsCreated: type.number()
+                          .allowNull(false)
+                          .default(0)
+                          .required(),
+    sub:              type.string()
+                          .allowNull(false)
+                          .required(),
+    createdAt:        type.date()
+                          .default(r.now())
+                          .allowNull(false)
+                          .required(),
+    deletedAt:        type.date()
+                          .default(null)
+                          .allowNull(true)
   }, {
     init: false,
     enforce_extra: 'remove'

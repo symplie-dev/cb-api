@@ -6,8 +6,9 @@ module.exports = function (app) {
   var Model = app.get('Model');
 
   return q.all([
-    Model.Group.hasAndBelongsToMany(Model.User, 'members', 'id', 'username', { init: false }),
-    Model.User.hasAndBelongsToMany(Model.Group, 'groups', 'username', 'id', { init: false }),
+    Model.Group.hasAndBelongsToMany(Model.User, 'members', 'id', 'id', { init: false }),
+    Model.User.hasAndBelongsToMany(Model.Group, 'groups', 'id', 'id', { init: false }),
+    Model.Group.belongsTo(Model.User, 'creator', 'CreatorId', 'id', { init: false }),
 
     Model.User.hasMany(Model.Friendship, 'friendships', 'FriendshipId', 'id', { init: false }),
     Model.Friendship.hasOne(Model.User, 'requester', 'RequesterId', 'id', { init: false }),
