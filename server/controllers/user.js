@@ -54,7 +54,11 @@ module.exports = function (app, router) {
   // Create a group
   router.route('/:actionUserId/groups')
     .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      Service.Group.getByUserId(req.params.actionUserId).then(function (groups) {
+        res.status(200).json({ status: 200, data: groups });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .post(function (req, res) {
       req.body.CreatorId = req.params.actionUserId;

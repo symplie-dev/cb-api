@@ -87,7 +87,15 @@ module.exports = function (app) {
    * @return {Promise<Array<Object>>} The list of associated groups
    */
   Service.getByUserId = function (userId) {
-    return q.reject(new Error('NOT YET IMPLEMENTED'));
+    return Model.User.getAll(userId).filter({ deletedAt: null }).getJoin({ groups: true }).then(function (user) {
+      user = user[0];
+
+      if (user) {
+        return user.groups;
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('User not found; unable to retrieve groups.'));
+      }
+    });
   };
 
   /**
@@ -98,16 +106,6 @@ module.exports = function (app) {
    */
   Service.remove = function (groupId) {
     return q.reject(new Error('NOT YET IMPLEMENTED'));
-  };
-
-  /**
-   * Get all users associated with a group
-   * 
-   * @param {String} groupId The id of the group to get members for
-   * @return {Promise<Array<Object>>} The member list associated with the group
-   */
-  Service.getMembers = function (groupId) {
-    return q.reject(new Error('NOT YET IMPLEMENTED'));  
   };
 
   /**

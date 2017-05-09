@@ -1960,6 +1960,46 @@
 			"response": []
 		},
 		{
+			"name": "Get user1 groups",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains name property'] = res.data.length === 2;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Delete user1 (cleanup)",
 			"event": [
 				{
