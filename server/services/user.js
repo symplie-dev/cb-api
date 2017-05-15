@@ -64,6 +64,26 @@ module.exports = function (app) {
   };
 
   /**
+   * Update a user. Currently `username` is the only editable field.
+   * 
+   * @param {Object} user The id of the user to update
+   * @return {Promise<Object>} Promise containing the updated user
+   */
+  Service.update = function (user) {
+    return Model.User.getAll(user.id).filter({ deletedAt: null }).then(function (updUser) {
+      updUser = updUser[0];
+
+      if (updUser) {
+        return Model.User.get(user.id).update({
+          username: user.username
+        });
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('User not found'));
+      }
+    });
+  };
+
+  /**
    * Delete a particular user. This will begin a cascade delete
    * of all friendships the user is a part of AND groups.
    * 

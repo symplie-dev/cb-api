@@ -39,7 +39,14 @@ module.exports = function (app, router) {
       });
     })
     .put(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      var user = req.body;
+
+      user.id = req.params.actionUserId;
+      Service.User.update(user).then(function (updUser) {
+        res.status(200).json({ status: 200, data: updUser });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .delete(function (req, res) {
       Service.User.delete(req.params.actionUserId).then(function (user) {
@@ -48,7 +55,6 @@ module.exports = function (app, router) {
         res.status(err.status || 500).json(_errorResponse(err));
       });
     });
-    
   
   // Get all the groups a user is a member of
   // Create a group
@@ -219,7 +225,7 @@ module.exports = function (app, router) {
       data: {
         message: err.message || 'Internal server error'
       }
-    }
+    };
   }
 
   return q({
