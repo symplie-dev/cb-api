@@ -85,8 +85,15 @@ module.exports = function (app, router) {
         res.status(err.status || 500).json(_errorResponse(err));
       });
     })
-    .put(authorize.group.member, function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .put(authorize.group.admin, function (req, res) {
+      var group = req.body;
+
+      group.id = req.params.groupId;
+      Service.Group.update(group).then(function (updGroup) {
+        res.status(200).json({ status: 200, data: updGroup });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .delete(function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });

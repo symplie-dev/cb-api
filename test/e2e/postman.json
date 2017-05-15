@@ -375,7 +375,7 @@
 						"exec": [
 							"var res = JSON.parse(responseBody);",
 							"",
-							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['proper response code'] = responseCode.code === 200;",
 							"tests['contains username property'] = typeof res.data.username === 'string';",
 							"tests['username property equals username'] = res.data.username === 'test5_update';",
 							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
@@ -2408,6 +2408,83 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"name\": \"group3\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Update group3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains name property'] = res.data.name === 'group3_update';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups/{{idGroup3}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group3_update\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Attempt update group3 nonmember",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 401;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup3}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group3_update\"\n}"
 				},
 				"description": ""
 			},

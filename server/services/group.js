@@ -101,6 +101,26 @@ module.exports = function (app) {
   };
 
   /**
+   * Updatee a group. Only the `name` property is editable.
+   * 
+   * @param {Object} group The group to update
+   * @return {Promise<Object>} Promise containing the updated group
+   */
+  Service.update = function (group) {
+    return Model.Group.getAll(group.id).filter({ deletedAt: null }).then(function (updGroup) {
+      updGroup = updGroup[0];
+
+      if (updGroup) {
+        return Model.Group.get(group.id).update({
+          name: group.name
+        });
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Group not foundd'));
+      }
+    });
+  };
+
+  /**
    * Get all groups associated with the given user ID. This will also return
    * group memberships that are not accepted IFF it has also not been rejected.
    * 
