@@ -16,12 +16,8 @@ module.exports = function (app) {
                     .allowNull(false)
                     .required(),
     name:       type.string()
-                    .min(1)
+                    .min(2)
                     .max(128)
-                    .allowNull(false)
-                    .required(),
-    CreatorId:  type.string()
-                    .uuid(4)
                     .allowNull(false)
                     .required(),
     createdAt:   type.date()

@@ -24,6 +24,7 @@ module.exports = function () {
     consts: {
       MAX_FRIENDS: 50,
       MAX_GROUPS: 25,
+      MAX_MEMBERSHIPS: 25,
       MAX_USER_BOOKMARKS: 100,
       MAX_GROUP_BOOKMARKS: 100
     },

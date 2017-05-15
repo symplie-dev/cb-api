@@ -28,8 +28,8 @@ module.exports = function (app) {
           data: { message: HttpErrors.Const.NotAuthorized.MESSAGE }
         });
       } else {
-        Model.Bookmark.get(bookmarkId).then(function (bookmark) {
-          if (bookmark.SenderId === actionUserId || bookmark.ReceiverId === actionUserId) {
+        Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).then(function (bookmark) {
+          if (bookmark && bookmark.SenderId === actionUserId || bookmark.ReceiverId === actionUserId) {
             next();
           } else {
             Logger.error('%s - %s attempted action on unaffiliated bookmark %s', reqIp, actionUserId, bookmarkId);

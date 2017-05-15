@@ -9,7 +9,9 @@ module.exports = function (app) {
   return {
     /**
      * Generic authorization middleware that ensures the user initiating the
-     * action on a particulaar resource is allowed to do so.
+     * action on a particular resource is allowed to do so. This means that
+     * the user initiating the action :actionUserId matches the id asociated
+     * with the x-cb-sub header.
      * 
      * @param {HttpRequest} req The request object
      * @param {HttpResponse} res The response object

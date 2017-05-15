@@ -61,8 +61,7 @@ module.exports = function (app, router) {
       });
     })
     .post(function (req, res) {
-      req.body.CreatorId = req.params.actionUserId;
-      Service.Group.create(req.body).then(function (group) {
+      Service.Group.create(req.body, req.params.actionUserId).then(function (group) {
         res.status(201).json({ status: 201, data: group });
       }).catch(function (err) {
         res.status(err.status || 500).json(_errorResponse(err));
@@ -73,15 +72,52 @@ module.exports = function (app, router) {
   // Update a particular group
   // Delete a paricular group
   router.route('/:actionUserId/groups/:groupId')
-    .get(function (req, res) {
+    .get(authorize.group.member, function (req, res) {
       Service.Group.get(req.params.groupId).then(function (group) {
         res.status(200).json({ status: 200, data: group });
       }).catch(function (err) {
         res.status(err.status || 500).json(_errorResponse(err));
       });
     })
-    .put(function (req, res) {
+    .put(authorize.group.member, function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
+    })
+    .delete(function (req, res) {
+      res.status(501).json({ status: 501, message: 'Not implemented' });
+    });
+
+  // Get all members of a group
+  // Create a new membership invite for a group
+  router.route('/:actionUserId/groups/:groupId/members')
+    .get(authorize.group.member, function (req, res) {
+      res.status(501).json({ status: 501, message: 'Not implemented' });
+    })
+    .post(authorize.group.member, function (req, res) {
+      Service.Group.createGroupMembershipInvite(
+        req.params.groupId,
+        req.params.actionUserId,
+        req.body.UserId,
+        req.body.role
+      ).then(function (membership) {
+        res.status(201).json({ status: 201, data: membership });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
+    });
+  
+  // Accept/Reject a membership invite
+  // Remove a previously accepted membership
+  router.route('/:actionUserId/groups/:groupId/members/:memberId')
+    .put(function (req, res) {
+      return Service.Group.updateMembershipStatus(
+        req.params.groupId,
+        req.params.actionUserId,
+        req.body.status
+      ).then(function (membership) {
+        res.status(200).json({ status: 200, data: membership });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
     .delete(function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
@@ -115,7 +151,7 @@ module.exports = function (app, router) {
       }).catch(function (err) {
         res.status(err.status || 500).json(_errorResponse(err));
       });
-    })
+    });
   
   // The aUserId is the user requesting the action
   // Add friendship (requested)

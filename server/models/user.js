@@ -27,6 +27,10 @@ module.exports = function (app) {
                           .allowNull(false)
                           .default(0)
                           .required(),
+    numMemberships:   type.number()
+                          .allowNull(false)
+                          .default(0)
+                          .required(),
     sub:              type.string()
                           .allowNull(false)
                           .required(),

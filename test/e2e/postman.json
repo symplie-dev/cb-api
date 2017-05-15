@@ -1481,7 +1481,7 @@
 						"exec": [
 							"var res = JSON.parse(responseBody);",
 							"",
-							"tests['proper response code'] = responseCode.code === 404;"
+							"tests['proper response code'] = responseCode.code === 401;"
 						]
 					}
 				}
@@ -1726,7 +1726,10 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['Contains name property'] = res.data.name === 'group1';",
-							"tests['Contains CreatorId property'] = res.data.CreatorId === environment.user1Id;",
+							"tests['Contains members property'] = Array.isArray(res.data.members);",
+							"tests['Contains the creator within the members array'] = res.data.members[0].UserId === environment.user1Id;",
+							"tests['Contains expanded creator'] = typeof res.data.members[0].user === 'object'",
+							"tests['Expanded creator is the creator of the group'] = res.data.members[0].user.id === environment.user1Id;",
 							""
 						]
 					}
@@ -1767,8 +1770,9 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
 							"tests['Contains name property'] = res.data.name === 'group1';",
-							"tests['Contains creator property'] = res.data.creator.id === environment.user1Id;",
 							"tests['Contains members property'] = res.data.members.length === 1;",
+							"tests['Contains the user1 in the member list'] = res.data.members[0].user.id = environment.user1Id;",
+							"tests['User1 is the owner'] = res.data.members[0].role = 'admin';",
 							""
 						]
 					}
@@ -1809,6 +1813,7 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
 							"tests['Contains numGroupsCreated property'] = res.data.numGroupsCreated === 1;",
+							"tests['Contains numMemberships property'] = res.data.numMemberships === 1;",
 							""
 						]
 					}
@@ -1847,7 +1852,7 @@
 						"exec": [
 							"var res = JSON.parse(responseBody);",
 							"",
-							"tests['proper response code'] = responseCode.code === 404;",
+							"tests['proper response code'] = responseCode.code === 401;",
 							"tests['Contains name property'] = typeof res.data.message === 'string';",
 							""
 						]
@@ -1890,7 +1895,10 @@
 							"",
 							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['Contains name property'] = res.data.name === 'group2';",
-							"tests['Contains CreatorId property'] = res.data.CreatorId === environment.user1Id;",
+							"tests['Contains members property'] = Array.isArray(res.data.members);",
+							"tests['Contains the creator within the members array'] = res.data.members[0].UserId === environment.user1Id;",
+							"tests['Contains expanded creator'] = typeof res.data.members[0].user === 'object'",
+							"tests['Expanded creator is the creator of the group'] = res.data.members[0].user.id === environment.user1Id;",
 							""
 						]
 					}
@@ -1930,7 +1938,8 @@
 							"var res = JSON.parse(responseBody);",
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['Contains name numGroupsCreated'] = res.data.numGroupsCreated === 2",
+							"tests['Contains name numGroupsCreated'] = res.data.numGroupsCreated === 2;",
+							"tests['Contains name numMemberships'] = res.data.numMemberships === 2;",
 							""
 						]
 					}
@@ -1970,7 +1979,7 @@
 							"var res = JSON.parse(responseBody);",
 							"",
 							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['Contains name property'] = res.data.length === 2;",
+							"tests['Contains 2 groups'] = res.data.length === 2;",
 							""
 						]
 					}
@@ -1994,6 +2003,370 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group1 invite (user2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/members",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"UserId\": \"{{user2Id}}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group1 invite (user3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/members",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"UserId\": \"{{user3Id}}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user2 groups",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains 1 group'] = res.data.length === 1;",
+							"tests['Member of 1 group'] = res.data[0].role === 'member';",
+							"tests['Group invite has not been accepted'] = res.data[0].status === 'pending';",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get group1 members",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains 3 members'] = res.data.members.length === 3;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Accpt user2Group1 membership invite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains UserId property'] = res.data.UserId === environment.user2Id;",
+							"tests['Contains status property'] = res.data.status === 'accepted';",
+							"tests['Contains acceptedAt property'] = res.data.acceptedAt !== null;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups/{{idGroup1}}/members/{{user2Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Reject user3Group1 membership invite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains UserId property'] = res.data.UserId === environment.user3Id;",
+							"tests['Contains status property'] = res.data.status === 'rejected';",
+							"tests['Contains null acceptedAt property'] = res.data.acceptedAt === null;",
+							"tests['Contains rejectedAt property'] = res.data.rejectedAt !== null;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}/groups/{{idGroup1}}/members/{{user3Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm group1 members",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains 1 group'] = res.data.members.length === 2;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idGroup3', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['Contains name property'] = res.data.name === 'group3';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group3\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Attempt group invite user2/4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 404;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups/{{idGroup3}}/members",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"UserId\": \"{{user4Id}}\"\n}"
 				},
 				"description": ""
 			},

@@ -84,13 +84,26 @@ module.exports = function (app) {
           // Delete all bookmarks created by the user or received by the user
           Model.Bookmark.getAll(userId, { index: 'SenderId' }).update({ deletedAt: r.now() }),
           Model.Bookmark.getAll(userId, { index: 'ReceiverId' }).update({ deletedAt: r.now() }),
-          // TODO REMOVE GROUPS USER OWNS
+          // Delete all user memberships
+          Model.Membership.getAll(userId, { index: 'UserId' }).filter({ role: 'owner' }),
+          Model.Membership.getAll(userId, { index: 'UserId' }).update({ deletedAt: r.now() }),
           // Delete the user record itself
           Model.User.get(userId).update({ deletedAt: r.now() })
         ]);
       } else {
         return q.reject(new Errors.Db.EntityNotFound('User not found'));
       }
+    }).then(function (res) {
+      var groupDels = [];
+
+      res[4].forEach(function (membership) {
+        // Delete each group the user owns
+        groupDels.push(Model.Group.getAll(membership.GroupId).update({ deletedAt: r.now() }));
+        // Delete all memberships attached to the group the user owns
+        groupDels.push(Model.Membership.getAll(membership.GroupId, { index: 'GroupId' }).update({ deletedAt: r.now() }));
+      });
+
+      return q.all(groupDels);
     }).then(function () {
       return user;
     });

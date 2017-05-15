@@ -14,36 +14,56 @@ module.exports = function (app) {
    * Create a new group.
    * 
    * @param  {Object} group The group to be created
+   * @param  {String} creatorId The id of the user creating the group
    * @return {Promise<Object>} The newly created group
    */
-  Service.create = function (group) {
-    return Model.User.getAll(group.CreatorId).filter({ deletedAt: null }).then(function (creator) {
+  Service.create = function (group, creatorId) {
+    var creator;
+
+    return Model.User.getAll(creatorId).filter({ deletedAt: null }).then(function (c) {
       var groupId = uuid.v4();
 
-      creator = creator[0];
+      creator = c[0];
       group.id = groupId;
 
-      if (creator && creator.numGroupsCreated < Config.consts.MAX_GROUPS) {
-        return q.all([
-          // Increment the created groups counter
-          Model.User.get(group.CreatorId).update({
-            numGroupsCreated:  r.row('numGroupsCreated').add(1).default(1)
-          }),
-          // Save the group
-          Model.Group.save(group),
-          // Save the association
-          Model.Group_User.save({
-            Group_id: groupId,
-            User_id: group.CreatorId
-          })
-        ]);
-      } else if (creator) {
-        return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of allowed groups.'));
+      if (creator) {
+        return r.table(Model.User.getTableName()).get(creatorId).update(function (user) {
+          return r.branch(
+            user('numGroupsCreated').lt(Config.consts.MAX_GROUPS).and(
+              user('numMemberships').lt(Config.consts.MAX_MEMBERSHIPS)
+            ),
+            {
+              numGroupsCreated: user('numGroupsCreated').add(1),
+              numMemberships: user('numMemberships').add(1)
+            },
+            {}
+          );
+        }).then(function (result) {
+          if (result.replaced > 0) {
+            return q.all([
+              Model.Group.save(group),
+              // Save the association
+              Model.Membership.save({
+                GroupId: groupId,
+                UserId: creatorId,
+                status: 'accepted',
+                acceptedAt: r.now(),
+                role: 'admin'
+              })
+            ]);
+          } else {
+            return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of allowed groups or memberships.'));
+          }
+        });
       } else {
         return q.reject(new Errors.Db.EntityNotFound('Creator not found; unable to create group.'));
       }
     }).then(function (res) {
-      return q(res[1]);
+      var group = res[0];
+
+      res[1].user = creator;
+      group.members = [res[1]];
+      return q(res[0]);
     });
   };
 
@@ -51,47 +71,54 @@ module.exports = function (app) {
    * Get a specific group by id.j;
    * 
    * @param {String} groupId The id of the group to fetch
+   * @param {Object} [opts] Optional options for building response
    * @return {Promise<Object>} The group
    */
-  Service.get = function (groupId) {
-    return Model.Group.getAll(groupId).filter({ deletedAt: null }).getJoin({
-      creator: {
-        apply: function (user) {
-          return user.filter(function (doc) {
-            return doc('deletedAt').eq(null);
-          }).without('sub');
-        }
-      },
-      members: {
-        _apply: function (user) {
-          return user.filter(function (doc) {
-            return doc('deletedAt').eq(null);
-          }).without('sub');
-        }
-      }
-    }).then(function (group) {
-      group = group[0];
+  Service.get = function (groupId, opts) {
+    var group;
 
-      if (group && group.creator) {
-        return group;
+    opts = opts || {};
+    if (typeof opts.expandUser !== 'boolean') {
+      opts.expandUser = true;
+    }
+
+    return Model.Group.getAll(groupId).filter({ deletedAt: null }).then(function (g) {
+      group = g[0];
+
+      if (group) {
+        return Model.Membership.getAll(groupId, { index: 'GroupId' }).filter({
+          rejectedAt: null,
+          deletedAt: null
+        }).getJoin({ user: opts.expandUser });
       } else {
         return q.reject(new Errors.Db.EntityNotFound('Group not found'));
       }
+    }).then(function (members) {
+      group.members = members;
+
+      return q(group);
     });
   };
 
   /**
-   * Get all groups associated with the given user ID.
+   * Get all groups associated with the given user ID. This will also return
+   * group memberships that are not accepted IFF it has also not been rejected.
    * 
    * @param {String} userId The user id to fetch groups for
    * @return {Promise<Array<Object>>} The list of associated groups
    */
   Service.getByUserId = function (userId) {
-    return Model.User.getAll(userId).filter({ deletedAt: null }).getJoin({ groups: true }).then(function (user) {
-      user = user[0];
+    return q.all([
+      Model.User.getAll(userId).filter({ deletedAt: null }),
+      Model.Membership.getAll(userId, { index: 'UserId' }).filter({
+        deletedAt: null,
+        rejectedAt: null
+      }).getJoin({ group: true })
+    ]).then(function (res) {
+      var user = res[0][0];
 
       if (user) {
-        return user.groups;
+        return res[1];
       } else {
         return q.reject(new Errors.Db.EntityNotFound('User not found; unable to retrieve groups.'));
       }
@@ -109,6 +136,94 @@ module.exports = function (app) {
   };
 
   /**
+   * Create a group membership invite.
+   * 
+   * @param {String} groupId The group to create a membership request for
+   * @param {String} requesterId The user adding another user to the group
+   * @param {String} requestedId The user to add to the group
+   * @param {String} [role] The optional role; defaults to member
+   * @return {Promise<Object>} The membership request
+   */
+  Service.createGroupMembershipInvite = function (groupId, requesterId, requestedId, role) {
+    var group,
+        user;
+    
+    if (typeof role !== 'string') {
+      role = 'member';
+    }
+    // Only allow group invites between friends
+    return app.get('Service').User.validateFriendship(requesterId, requestedId, 'accepted').then(function () {
+      return q.all([
+        Service.get(groupId, { expandUser: false }),
+        Model.User.getAll(requestedId).filter({ deletedAt: null })
+      ]);
+    }).then(function (res) {
+      var exists;
+
+      group = res[0];
+      user = res[1][0];
+
+      exists = _membershipExists(user, group);
+
+      if (exists) {
+        return q.reject(new Errors.Db.EntityConflict('Membership already exists'));
+      } else {
+        return r.table(Model.User.getTableName()).get(requestedId).update(function (user) {
+          return r.branch(
+            user('numMemberships').lt(Config.consts.MAX_MEMBERSHIPS),
+              { numGroupsJoined: user('numMemberships').add(1) },
+              {}
+          );
+        });
+      }
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return Model.Membership.save({
+          GroupId: groupId,
+          UserId: requestedId,
+          role: role
+        });
+      } else {
+        return q.reject(new Errors.Http.BadRequest('User has reached the maximum number of allowed groups.'));
+      }
+    });
+  };
+
+  /**
+   * Accept or reject an invite to a group.
+   * 
+   * @param {String} groupId The group id in the membership
+   * @param {String} memberId The user accepting/rejecting the membership
+   * @param {String} status The new status of the membership
+   * @return {Promise<Object>} The modified membership
+   */
+  Service.updateMembershipStatus = function (groupId, memberId, status) {
+    return (function () {
+      if (status === 'accepted') {
+        return _acceptMembership(groupId, memberId);
+      } else if (status === 'rejected') {
+        return _rejectMembership(groupId, memberId);
+      } else {
+        return q.reject(new Errors.Http.BadRequest('Invalid membership status.'));
+      }
+    })().then(function (membership) {
+      membership = membership[0];
+
+      if (!membership) {
+        return q.reject(new Errors.Db.EntityNotFound('Membership invite not found'));
+      } else {
+        return q(membership);
+      }
+    });
+  };
+
+  Service.getMembers = function (groupId) {
+    Service.get(groupId).then(function (group) {
+      return q(group.members);
+    });
+  };
+
+  /**
    * Add a member to a group
    * 
    * @param {String} groupId The id of the group to add the member to
@@ -116,7 +231,36 @@ module.exports = function (app) {
    * @return {Promise<Object>} The group with updated member list
    */
   Service.addMember = function (groupId, userId) {
-    return q.reject(new Error('NOT YET IMPLEMENTED'));
+    var group,
+        user;
+
+    return q.all([
+      Model.Group.getAll(groupId).filter({ deletedAt: null }).getJoin({ members: true }),
+      Model.User.getAll(userId).filter({ deletedAt: null })
+    ]).then(function (res) {
+      var exists;
+
+      group = res[0];
+      user = res[1];
+
+      if (!group) {
+        return q.reject(new Errors.Db.EntityNotFound('Group not found; could not add member.'));
+      } else if (!user) {
+        return q.reject(new Errors.Db.EntityNotFound('User not found; could not add member.'));
+      } else {
+        // Check if user is already a member
+        exists = _membershipExists(user, group);
+
+        if (exists) {
+          return q.reject(new Errors.Db.EntityConflict('Membership already exists'));
+        } else {
+          return Model.Group_User.save({
+            User_id: user.id,
+            Group_id: group.id
+          });
+        }
+      }
+    });
   };
 
   /**
@@ -129,6 +273,57 @@ module.exports = function (app) {
   Service.removeMember = function (groupId, userId) {
     return q.reject(new Error('NOT YET IMPLEMENTED'));
   };
+
+  /**
+   * Check if the membership exists.
+   * 
+   * @param {Object} user The user to check for membership
+   * @param {Object} group The group to check for membership
+   * @return {Boolean} True if the membership exists, else false
+   */
+  function _membershipExists(user, group) {
+    var exists = false,
+        i;
+
+    for (i = 0; i < group.members.length; i++) {
+      if (group.members[i].UserId === user.id) {
+        exists = true;
+        break;
+      }
+    }
+
+    return exists;
+  }
+
+  function _acceptMembership(groupId, memberId) {
+    return r.table(Model.User.getTableName()).get(memberId).update(function (user) {
+      return r.branch(
+        user('numMemberships').lt(Config.consts.MAX_MEMBERSHIPS),
+        {
+          numMemberships: user('numMemberships').add(1)
+        },
+        {}
+      );
+    }).then(function (result) {
+      if (result.replaced >= 0) {
+        return Model.Membership.getAll([groupId, memberId], { index: 'membership' }).filter({
+          deletedAt: null
+        }).update({
+          status: 'accepted',
+          acceptedAt: r.now()
+        });
+      } else {
+        return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of allowed groups.'));
+      }
+    });
+  }
+
+  function _rejectMembership(groupId, memberId) {
+    return Model.Membership.getAll([groupId, memberId], { index: 'membership' }).update({
+      status: 'rejected',
+      rejectedAt: r.now()
+    });
+  }
 
   return q({
     name: 'Group',
