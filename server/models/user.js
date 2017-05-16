@@ -16,7 +16,7 @@ module.exports = function (app) {
                           .allowNull(false)
                           .required(),
     username:         type.string()
-                          .regex('^[a-zA-Z0-9_-]{1,15}$')
+                          .regex('^[a-zA-Z0-9_-]{3,15}$')
                           .allowNull(false)
                           .required(),
     numFriends:       type.number()

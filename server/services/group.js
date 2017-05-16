@@ -115,7 +115,52 @@ module.exports = function (app) {
           name: group.name
         });
       } else {
-        return q.reject(new Errors.Db.EntityNotFound('Group not foundd'));
+        return q.reject(new Errors.Db.EntityNotFound('Group not found'));
+      }
+    });
+  };
+
+  /**
+   * Delete the given group.
+   * 
+   * @param {String} groupId The id of the group to delete
+   * @return {Promise<Object>} The deleted group
+   */
+  Service.delete = function (groupId) {
+    var group;
+
+    return Model.Group.getAll(groupId).filter({ deletedAt: null }).then(function (g) {
+      group = g[0];
+
+      if (group) {
+        return q.all([
+          // Delete the group itself
+          Model.Group.get(groupId).update({ deletedAt: r.now() }),
+          // Delete all memberships
+          Model.Membership.getAll(groupId, { index: 'GroupId' }).filter({
+            deletedAt: null
+          }).update({
+            deletedAt: r.now()
+          }).then(function (memberships) {
+            var memberPrms = [];
+            // Decrememt numMemberships property for each member
+            memberships.forEach(function (membership) {
+              if (membership.status === 'accepted') {
+                memberPrms.push(
+                  Model.User.getAll(membership.UserId).update({
+                    numMemberships: r.row('numMemberships').sub(1)
+                  })
+                );
+              }
+            });
+
+            return q.all(memberPrms);
+          })
+        ]).then(function () {
+          return q(group);
+        });
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Group not found'));
       }
     });
   };
@@ -188,23 +233,11 @@ module.exports = function (app) {
       if (exists) {
         return q.reject(new Errors.Db.EntityConflict('Membership already exists'));
       } else {
-        return r.table(Model.User.getTableName()).get(requestedId).update(function (user) {
-          return r.branch(
-            user('numMemberships').lt(Config.consts.MAX_MEMBERSHIPS),
-              { numGroupsJoined: user('numMemberships').add(1) },
-              {}
-          );
-        });
-      }
-    }).then(function (result) {
-      if (result.replaced > 0) {
         return Model.Membership.save({
           GroupId: groupId,
           UserId: requestedId,
           role: role
         });
-      } else {
-        return q.reject(new Errors.Http.BadRequest('User has reached the maximum number of allowed groups.'));
       }
     });
   };

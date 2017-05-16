@@ -2209,6 +2209,86 @@
 			"response": []
 		},
 		{
+			"name": "Confirm user2 membership count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Group invite should not count against memberships'] = res.data.numMemberships === 0;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user3 membership count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Group invite should not count against memberships'] = res.data.numMemberships === 0;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Get group1 members",
 			"event": [
 				{
@@ -2291,6 +2371,46 @@
 			"response": []
 		},
 		{
+			"name": "Confirm user2 membership count increase",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Membership counnt should be one after accepting invite'] = res.data.numMemberships === 1;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Reject user3Group1 membership invite",
 			"event": [
 				{
@@ -2328,6 +2448,86 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user3 membership count no change",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Rejected group invite should not count against memberships'] = res.data.numMemberships === 0;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user3 groups",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains 1 group'] = res.data.length === 0;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}/groups",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group1\"\n}"
 				},
 				"description": ""
 			},
@@ -2524,6 +2724,404 @@
 				"body": {
 					"mode": "raw",
 					"raw": "{\n\t\"UserId\": \"{{user4Id}}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"postman.setEnvironmentVariable('idGroup4', res.data.id);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['Contains name property'] = res.data.name === 'group4';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group4\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group4 invite (user2)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup4}}/members",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"UserId\": \"{{user2Id}}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Create group4 invite (user3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup4}}/members",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"UserId\": \"{{user3Id}}\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user2 membership count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['user has 2 memberships'] = res.data.numMemberships === 2;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user3 membership count",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['user has 0 memberships'] = res.data.numMemberships === 0;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Accpt user2Group4 membership invite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains UserId property'] = res.data.UserId === environment.user2Id;",
+							"tests['Contains status property'] = res.data.status === 'accepted';",
+							"tests['Contains acceptedAt property'] = res.data.acceptedAt !== null;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/groups/{{idGroup4}}/members/{{user2Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Reject user3Group4 membership invite",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains UserId property'] = res.data.UserId === environment.user3Id;",
+							"tests['Contains status property'] = res.data.status === 'rejected';",
+							"tests['Contains null acceptedAt property'] = res.data.acceptedAt === null;",
+							"tests['Contains rejectedAt property'] = res.data.rejectedAt !== null;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}/groups/{{idGroup1}}/members/{{user3Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete group4",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['Contains name property'] = res.data.name === 'group4';"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup4}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"group4\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user2 membership count after del",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['user has 2 memberships'] = res.data.numMemberships === 2;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get user3 membership count after del",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['user has 0 memberships'] = res.data.numMemberships === 0;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
 				},
 				"description": ""
 			},

@@ -18,7 +18,7 @@ module.exports = function (app) {
      * @return {undefined}
      */
     member: function (req, res, next) {
-      _authHelper(req, res, next, ['member', 'admin']);
+      _authHelper(req, res, next, ['member', 'admin', 'owner']);
     },
 
     /**
@@ -31,7 +31,7 @@ module.exports = function (app) {
      * @return {undefined}
      */
     admin: function (req, res, next) {
-      _authHelper(req, res, next, ['admin']);
+      _authHelper(req, res, next, ['admin', 'owner']);
     }
   };
 
