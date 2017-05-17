@@ -271,7 +271,7 @@ module.exports = function (app) {
   };
 
   Service.getMembers = function (groupId) {
-    Service.get(groupId).then(function (group) {
+    return Service.get(groupId).then(function (group) {
       return q(group.members);
     });
   };
