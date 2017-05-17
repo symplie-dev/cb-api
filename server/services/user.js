@@ -139,10 +139,24 @@ module.exports = function (app) {
    */
   Service.createFriendship = function (requesterId, requestedId) {
     return Service.validateFriendshipRequest(requesterId, requestedId).then(function () {
-      return Model.Friendship.save({
-        RequesterId: requesterId,
-        RequestedId: requestedId
+      return r.table(Model.User.getTableName()).get(requesterId).update(function (user) {
+        return r.branch(
+          user('numFriends').lt(Config.consts.MAX_FRIENDS),
+          {
+            numFriends: user('numFriends').add(1)
+          },
+          {}
+        );
       });
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return Model.Friendship.save({
+          RequesterId: requesterId,
+          RequestedId: requestedId
+        });
+      } else {
+        return q.reject(new Errors.Http.BadRequest('You\'ve already reached the maximum number of friends; unable to request friendship'));
+      }
     });
   };
 
@@ -158,26 +172,94 @@ module.exports = function (app) {
     return r.table(Model.Friendship.getTableName()).getAll(
       [requesterId, requestedId],
       { index: 'friendship' }
-    ).filter({ deletedAt: null }).then(function (friendship) {
-      var upd = {};
-      
+    ).filter({ deletedAt: null, rejectedAt: null }).then(function (friendship) {
       friendship = friendship[0];
+
       if (friendship) {
         if (status === 'accepted') {
-          upd.acceptedAt = r.now();
-          upd.rejectedAt = null;
+          return _acceptFriendship(friendship);
         } else if (status === 'rejected') {
-          upd.rejectedAt = r.now();
-          upd.acceptedAt = null;
+          return _rejectFriendship(friendship);
         }
-        upd.status = status;
-
-        return Model.Friendship.get(friendship.id).update(upd);
       } else {
         return q.reject(new Errors.Db.EntityNotFound());
       }
     });
   };
+
+  function _acceptFriendship(friendship) {
+    return r.table(Model.Friendship.getTableName()).get(friendship.id).update(function (f) {
+      return r.branch(
+        f('status').eq('pending'),
+        {
+          acceptedAt: r.now(),
+          rejectedAt: null,
+          status: 'accepted'
+        },
+        {}
+      );
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
+          return r.branch(
+            user('numFriends').lt(Config.consts.MAX_FRIENDS),
+            {
+              numFriends: user('numFriends').add(1)
+            },
+            {}
+          );
+        });
+      } else {
+        return q.reject(new Errors.Http.BadRequest('Friendship already accepted/rejected'));
+      }
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return Model.Friendship.get(friendship.id);
+      } else {
+        // Roll back friendship status
+        return Model.Friendship.get(friendship.id).update({
+          status: 'pending',
+          acceptedAt: null
+        }).then(function () {
+          return q.reject(new Errors.Http.BadRequest('You\'ve already reached the maximum number of friends; unable to accept friendship'));
+        });
+      }
+    });
+    // return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
+    //   return r.branch(
+    //     user('numFriends').lt(Config.consts.MAX_FRIENDS),
+    //     {
+    //       acceptedAt: r.now(),
+    //       rejectedAt: null,
+    //       status: 'accepted'
+    //     },
+    //     {}
+    //   );
+    // }).then(function (result) {
+    //   if (result.replaced > 0) {
+    //     return Model.Friendship.get(friendship.id).update({
+
+    //     });
+    //   } else {
+    //     return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of friends; unable to accept friendship'));
+    //   }
+    // });
+  }
+
+  function _rejectFriendship(friendship) {
+    // Free up the 
+    return Model.User.get(friendship.RequesterId).update(function (user) {
+      return {
+        numFriends: user('numFriends').sub(1)
+      };
+    }).then(function () {
+      return Model.Friendship.get(friendship.id).update({
+        rejectedAt: r.now(),
+        acceptedAt: null,
+        status: 'rejected'
+      });
+    });
+  }
 
   /**
    * Get all friends associated with the user.
@@ -212,15 +294,16 @@ module.exports = function (app) {
         if (res[0].length === 1 && res[1].length === 1) {
           return q.all([
             // Ensure friendship does not exist
+            // A friendship does not exist if it was logically deleted or rejected
             r.table(Model.Friendship.getTableName()).getAll(
               [requesterId, requestedId],
               { index: 'friendship' }
-            ).filter({ deletedAt: null }).count().eq(0),
+            ).filter({ deletedAt: null, rejectedAt: null }).count().eq(0),
             // Ensure inverse friendship does not exist
             r.table(Model.Friendship.getTableName()).getAll(
               [requestedId, requesterId],
               { index: 'friendship' }
-            ).filter({ deletedAt: null }).count().eq(0)
+            ).filter({ deletedAt: null, rejectedAt: null }).count().eq(0)
           ]);
         } else {
           return q.reject(new Errors.Db.EntityNotFound('ERROR: Both users in the friendship not found'));
