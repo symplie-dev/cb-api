@@ -273,6 +273,55 @@ module.exports = function (app) {
     });
   };
 
+  Service.deleteFriendship = function (aUserId, bUserId) {
+    var friendship;
+
+    return q.all([
+      r.table(Model.Friendship.getTableName()).getAll(
+        [aUserId, bUserId],
+        { index: 'friendship' }
+      ).filter({ deletedAt: null, rejectedAt: null }),
+      r.table(Model.Friendship.getTableName()).getAll(
+        [bUserId, aUserId],
+        { index: 'friendship' }
+      ).filter({ deletedAt: null, rejectedAt: null })
+    ]).then(function (res) {
+      friendship = res[0][0] || res[1][0];
+
+      if (friendship) {
+        if (friendship.status === 'accepted') {
+          // Decrement friendships count for both requester and requested
+          return q.all([
+            Model.User.get(friendship.RequesterId).update(function (user) {
+              return {
+                numFriends: user('numFriends').sub(1)
+              };
+            }),
+            Model.User.get(friendship.RequestedId).update(function (user) {
+              return {
+                numFriends: user('numFriends').sub(1)
+              };
+            })
+          ]);
+        } else if (friendship.status === 'rejected') {
+          // No decrements needed
+          return q();
+        } else {
+          // Decrement friendships count for requester
+          return Model.User.get(friendship.RequesterId).update(function (user) {
+            return {
+              numFriends: user('numFriends').sub(1)
+            };
+          });
+        }
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Could not find friendship; unable to delete'));
+      }
+    }).then(function () {
+      return Model.Friendship.get(friendship.id).update({ deletedAt: r.now() });
+    });
+  };
+
   /**
    * Ensure the rules of a friendship are followed.
    * 

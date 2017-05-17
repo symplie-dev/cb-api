@@ -190,7 +190,11 @@ module.exports = function (app, router) {
       });
     })
     .delete(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      Service.User.deleteFriendship(req.params.actionUserId, req.params.bUserId).then(function (friendship) {
+        res.status(200).json({ status: 200, data: friendship });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
 
   // Get all bookmarks shared with a particular friend

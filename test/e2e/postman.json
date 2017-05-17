@@ -836,6 +836,47 @@
 			"response": []
 		},
 		{
+			"name": "Confirm user1 numFriends pt1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length = 3;",
+							"tests['proper numFriends count'] = res.data.numFriends = 3;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Accept friendship1 (user1,user2)",
 			"event": [
 				{
@@ -1184,6 +1225,340 @@
 					{
 						"key": "Authorization",
 						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user1 numFriends pt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length = 4;",
+							"tests['proper numFriends count'] = res.data.numFriends = 4;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Recreate friendship5 (user2,user3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 201;",
+							"tests['contains requesterId property'] = typeof res.data.RequesterId === 'string';",
+							"tests['requesterId equals user1Id'] = res.data.RequesterId === environment.user2Id;",
+							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
+							"tests['requestedId equals user2Id'] = res.data.RequestedId === environment.user3Id;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains status property'] = res.data.status === 'pending';",
+							"tests['contains acceptedAt property'] = res.data.acceptedAt === null;",
+							"tests['contains rejectedAt property'] = res.data.rejectedAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}/friends/{{user3Id}}",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Accept friendship5 (user2,user3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains requesterId property'] = typeof res.data.RequesterId === 'string';",
+							"tests['requesterId is correct'] = res.data.RequesterId === environment.user2Id;",
+							"tests['contains requestedId property'] = typeof res.data.RequestedId === 'string';",
+							"tests['requestedId is correct'] = res.data.RequestedId === environment.user3Id;",
+							"tests['contains createdAt property'] = typeof res.data.createdAt === 'string';",
+							"tests['contains status property'] = res.data.status === 'accepted';",
+							"tests['rejectedAt is not null'] = res.data.rejectedAt === null;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}/friends/{{user2Id}}",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"accepted\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user2 numFriends pt1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length === 3;",
+							"tests['proper numFriends count'] = res.data.numFriends === 3;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 2",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user3 numFriends pt1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length === 2;",
+							"tests['proper numFriends count'] = res.data.numFriends === 2;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Delete friendship5 (user2,user3)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}/friends/{{user2Id}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user2 numFriends pt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length === 2;",
+							"tests['proper numFriends count'] = res.data.numFriends === 2;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user2Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer 2",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user3 numFriends pt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length === 1;",
+							"tests['proper numFriends count'] = res.data.numFriends === 1;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user3Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser3}}",
 						"description": ""
 					}
 				],
@@ -1782,6 +2157,47 @@
 					{
 						"key": "Authorization",
 						"value": "Bearer {{tokenUser2}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Confirm user1 friends count decremented",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains friends property'] = Array.isArray(res.data.friends);",
+							"tests['contains 4 friends'] = res.data.friends.length = 3;",
+							"tests['proper numFriends count'] = res.data.numFriends = 3;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user1Id}}",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser1}}",
 						"description": ""
 					}
 				],
@@ -2653,6 +3069,45 @@
 			"response": []
 		},
 		{
+			"name": "Delete user4 (cleanup)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var res = JSON.parse(responseBody);",
+							"",
+							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['contains user1Id'] = res.data.id === environment.user4Id;"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "localhost:3000/api/users/{{user4Id}}",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{tokenUser4}}",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"status\": \"rejected\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
 			"name": "Attempt update group3 nonmember",
 			"event": [
 				{
@@ -3233,45 +3688,6 @@
 					{
 						"key": "Authorization",
 						"value": "Bearer {{tokenUser3}}",
-						"description": ""
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n\t\"status\": \"rejected\"\n}"
-				},
-				"description": ""
-			},
-			"response": []
-		},
-		{
-			"name": "Delete user4 (cleanup)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"type": "text/javascript",
-						"exec": [
-							"var res = JSON.parse(responseBody);",
-							"",
-							"tests['proper response code'] = responseCode.code === 200;",
-							"tests['contains user1Id'] = res.data.id === environment.user4Id;"
-						]
-					}
-				}
-			],
-			"request": {
-				"url": "localhost:3000/api/users/{{user4Id}}",
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"description": ""
-					},
-					{
-						"key": "Authorization",
-						"value": "Bearer {{tokenUser4}}",
 						"description": ""
 					}
 				],
