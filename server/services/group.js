@@ -241,6 +241,7 @@ module.exports = function (app) {
    * @return {Promise<Object>} The modified membership
    */
   Service.updateMembershipStatus = function (groupId, memberId, status) {
+
     return (function () {
       if (status === 'accepted') {
         return _acceptMembership(groupId, memberId);
@@ -250,8 +251,6 @@ module.exports = function (app) {
         return q.reject(new Errors.Http.BadRequest('Invalid membership status.'));
       }
     })().then(function (membership) {
-      membership = membership[0];
-
       if (!membership) {
         return q.reject(new Errors.Db.EntityNotFound('Membership invite not found'));
       } else {
@@ -350,7 +349,8 @@ module.exports = function (app) {
     }).then(function (result) {
       if (result.replaced >= 0) {
         return Model.Membership.getAll([groupId, memberId], { index: 'membership' }).filter({
-          deletedAt: null
+          deletedAt: null,
+          status: 'pending'
         }).update({
           status: 'accepted',
           acceptedAt: r.now()
@@ -358,13 +358,39 @@ module.exports = function (app) {
       } else {
         return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of allowed groups.'));
       }
+    }).then(function (upd) {
+      var membership = upd[0];
+      
+      if (membership) {
+        return q(membership);
+      } else {
+        // Roll back the membership increment
+        return Model.User.get(memberId).update(function (user) {
+          return {
+            numMemberships: user('numMemberships').sub(1)
+          };
+        }).then(function () {
+          return q.reject(new Errors.Db.EntityNotFound('Membership invite now found. Was it already accepted/rejected?'));
+        });
+      }
     });
   }
 
   function _rejectMembership(groupId, memberId) {
-    return Model.Membership.getAll([groupId, memberId], { index: 'membership' }).update({
+    return Model.Membership.getAll([groupId, memberId], { index: 'membership' }).filter({
+      deletedAt: null,
+      status: 'pending'
+    }).update({
       status: 'rejected',
       rejectedAt: r.now()
+    }).then(function (upd) {
+      var membership = upd[0];
+
+      if (membership) {
+        return q(membership);
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Membership invite now found. Was it already accepted/rejected?'));
+      }
     });
   }
 

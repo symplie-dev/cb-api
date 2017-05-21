@@ -1,2 +1,12 @@
-**/node_modules
+# VSCODE
 **/.vscode
+
+# Node/NPM
+**/npm-debug.log
+**/node_modules
+
+# OSX
+**/.DS_Store
+
+# Windows
+**/Thumbs.db

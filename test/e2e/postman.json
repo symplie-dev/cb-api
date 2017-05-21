@@ -103,7 +103,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{}"
+					"raw": ""
 				},
 				"description": ""
 			},
@@ -3450,7 +3450,7 @@
 				}
 			],
 			"request": {
-				"url": "localhost:3000/api/users/{{user3Id}}/groups/{{idGroup1}}/members/{{user3Id}}",
+				"url": "localhost:3000/api/users/{{user3Id}}/groups/{{idGroup4}}/members/{{user3Id}}",
 				"method": "PUT",
 				"header": [
 					{
