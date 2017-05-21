@@ -121,7 +121,7 @@ module.exports = function (app) {
   };
 
   /**
-   * Delete the given group.
+   * Delete the given group and all associated memberships
    * 
    * @param {String} groupId The id of the group to delete
    * @return {Promise<Object>} The deleted group
@@ -188,16 +188,6 @@ module.exports = function (app) {
         return q.reject(new Errors.Db.EntityNotFound('User not found; unable to retrieve groups.'));
       }
     });
-  };
-
-  /**
-   * Remove a group.
-   * 
-   * @param  {String} groupId The id of the group to remove
-   * @return {Promise<Object>} The removed group
-   */
-  Service.remove = function (groupId) {
-    return q.reject(new Error('NOT YET IMPLEMENTED'));
   };
 
   /**
@@ -277,54 +267,54 @@ module.exports = function (app) {
   };
 
   /**
-   * Add a member to a group
-   * 
-   * @param {String} groupId The id of the group to add the member to
-   * @param {String} userId The id of the user to add
-   * @return {Promise<Object>} The group with updated member list
-   */
-  Service.addMember = function (groupId, userId) {
-    var group,
-        user;
-
-    return q.all([
-      Model.Group.getAll(groupId).filter({ deletedAt: null }).getJoin({ members: true }),
-      Model.User.getAll(userId).filter({ deletedAt: null })
-    ]).then(function (res) {
-      var exists;
-
-      group = res[0];
-      user = res[1];
-
-      if (!group) {
-        return q.reject(new Errors.Db.EntityNotFound('Group not found; could not add member.'));
-      } else if (!user) {
-        return q.reject(new Errors.Db.EntityNotFound('User not found; could not add member.'));
-      } else {
-        // Check if user is already a member
-        exists = _membershipExists(user, group);
-
-        if (exists) {
-          return q.reject(new Errors.Db.EntityConflict('Membership already exists'));
-        } else {
-          return Model.Group_User.save({
-            User_id: user.id,
-            Group_id: group.id
-          });
-        }
-      }
-    });
-  };
-
-  /**
    * Remove a member from a group.
    * 
    * @param {String} groupId The id of the group to remove member from
-   * @param {String} userId The id of the user to remove
+   * @param {String} memberId The id of the user to remove
    * @return {Promise<Object>} The group with updated member list
    */
-  Service.removeMember = function (groupId, userId) {
-    return q.reject(new Error('NOT YET IMPLEMENTED'));
+  Service.removeMembership = function (groupId, memberId) {
+    var membership;
+    
+    return q.all([
+      Model.Membership.getAll([groupId, memberId], { index: 'membership' }).filter({
+        deletedAt: null
+      }),
+      Model.User.getAll(memberId).filter({ deletedAt: null })
+    ]).then(function (res) {
+      var user = res[1][0],
+          prms = [];
+
+      membership = res[0][0];
+
+      if (!membership) {
+        return q.reject(new Errors.Db.EntityNotFound('Membership not found.'));
+      }
+
+      // If the user is the admin for the group delete the group
+      if (membership && membership.role === 'admin') {
+        prms.push(Service.delete(membership.GroupId));
+      } else {
+        // Decrement memberships count IFF the membership was accepted
+        if (membership && membership.status === 'accepted' && user) {
+          prms.push(
+            Model.User.get(user.id).update(function (u) {
+              return {
+                numMemberships: u('numMemberships').sub(1)
+              };
+            })
+          );
+        }
+        // Update deletedAt property for logical delete
+        prms.push(
+          Model.Membership.get(membership.id).update({
+            deletedAt: r.now()
+          })
+        );
+      }
+
+      return q.all(prms);
+    });
   };
 
   /**

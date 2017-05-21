@@ -130,7 +130,7 @@ module.exports = function (app, router) {
   // Remove a previously accepted membership
   router.route('/:actionUserId/groups/:groupId/members/:memberId')
     .put(function (req, res) {
-      return Service.Group.updateMembershipStatus(
+      Service.Group.updateMembershipStatus(
         req.params.groupId,
         req.params.actionUserId,
         req.body.status
@@ -141,7 +141,12 @@ module.exports = function (app, router) {
       });
     })
     .delete(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+      // TODO: Let admin users remove other members
+      Service.Group.removeMembership(req.params.groupId, req.params.actionUserId).then(function () {
+        res.status(200).json({ status: 200, data: {} });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
   // Get all bookmarks associated with a group
