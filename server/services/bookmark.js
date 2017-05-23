@@ -154,6 +154,27 @@ module.exports = function (app) {
       .getJoin({ sender: true });
   };
 
+  /**
+   * Get the specified bookmark.
+   * 
+   * @param {String} bookmarkId The id of the bookmark to fetch
+   * @return {Promise<Object>} The bookmark
+   */
+  Service.getGroupBookmark = function (bookmarkId) {
+    return Model.Bookmark.getAll(bookmarkId)
+      .filter({ deletedAt: null })
+      .getJoin({ sender: true })
+      .then(function (bookmark) {
+        bookmark = bookmark[0];
+
+        if (bookmark) {
+          return q(bookmark);
+        } else {
+          return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
+        }
+      });
+  };
+
   return q({
     name: 'Bookmark',
     service: Service

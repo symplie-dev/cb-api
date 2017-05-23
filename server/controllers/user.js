@@ -170,8 +170,10 @@ module.exports = function (app, router) {
 
   // Delete a particular shared bookmark from a group
   router.route('/:actionUserId/groups/:groupId/bookmarks/:bookmarkId')
-    .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .get(authorize.group.member, function (req, res) {
+      Service.Bookmark.getGroupBookmark(req.params.bookmarkId).then(function (bookmark) {
+        res.status(200).json({ status: 200, data: bookmark });
+      });
     })
     .delete(function (req, res) {
       res.status(501).json({ status: 501, message: 'Not implemented' });
