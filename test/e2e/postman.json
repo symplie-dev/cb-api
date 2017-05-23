@@ -3085,7 +3085,7 @@
 						"exec": [
 							"var res = JSON.parse(responseBody);",
 							"",
-							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['Contains 0 bookmarks'] = typeof res.data === 'object';",
 							""
 						]
@@ -3125,7 +3125,7 @@
 						"exec": [
 							"var res = JSON.parse(responseBody);",
 							"",
-							"tests['proper response code'] = responseCode.code === 200;",
+							"tests['proper response code'] = responseCode.code === 201;",
 							"tests['Contains 0 bookmarks'] = typeof res.data === 'object';",
 							""
 						]
