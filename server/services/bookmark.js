@@ -14,7 +14,7 @@ module.exports = function (app) {
    * @param {String} senderId The creater/sender of the bookmark
    * @param {String} receiverId The receiver of the bookmark
    * @param {Object} bookmark The bookmark being shared
-   * @return {undefined}
+   * @return {Promise<Object>} The newly created bookmark
    */
   Service.createUserBookmark = function (senderId, receiverId, bookmark) {
     return app.get('Service').User.validateFriendship(senderId, receiverId, 'accepted').then(function () {
@@ -23,6 +23,7 @@ module.exports = function (app) {
       delete bookmark.createdAt;
       delete bookmark.deletedAt;
       delete bookmark.id;
+      delete bookmark.GroupId;
 
       return Model.Bookmark.save(bookmark);
     });
@@ -120,6 +121,37 @@ module.exports = function (app) {
       delete bookmark.receiver.deletedAt;
       return bookmark;
     });
+  };
+
+  /**
+   * Create a bookmark shared by a group.
+   * 
+   * @param {String} senderId The creator of the bookmark
+   * @param {String} groupId The group to share with
+   * @param {Object} bookmark The bookmark being shared
+   * @return {Promise<Object>} The newly created bookmark
+   */
+  Service.createGroupBookmark = function (senderId, groupId, bookmark){
+    bookmark.SenderId = senderId;
+    bookmark.GroupId = groupId;
+    delete bookmark.ReceiverId;
+    delete bookmark.createdAt;
+    delete bookmark.deletedAt;
+    delete bookmark.id;
+
+    return Model.Bookmark.save(bookmark);
+  };
+
+  /**
+   * Get all bookmarks associated with the group.
+   * 
+   * @param {String} groupId The group to get bookmarks for
+   * @return {Promise<Array<Object>>} The m
+   */
+  Service.getGroupBookmarks = function (groupId) {
+    return Model.Bookmark.getAll(groupId, { index: 'GroupId' })
+      .filter({ deletedAt: null })
+      .getJoin({ sender: true });
   };
 
   return q({

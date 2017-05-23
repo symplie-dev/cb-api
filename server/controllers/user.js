@@ -152,11 +152,19 @@ module.exports = function (app, router) {
   // Get all bookmarks associated with a group
   // Add a shared bookmark with a group
   router.route('/:actionUserId/groups/:groupId/bookmarks')
-    .get(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .get(authorize.group.member, function (req, res) {
+      Service.Bookmark.getGroupBookmarks(req.params.groupId).then(function (bookmarks) {
+        res.status(200).json({ status: 200, data: bookmarks });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     })
-    .post(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .post(authorize.group.member, function (req, res) {
+      Service.Bookmark.createGroupBookmark(req.params.actionUserId, req.params.groupId, req.body).then(function (bookmark) {
+        res.status(201).json({ status: 201, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
 
