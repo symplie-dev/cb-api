@@ -71,12 +71,8 @@ module.exports = function (app) {
     var bookmark;
 
     return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
-      sender: {
-        _apply: function (user) { return user.getPublicView(); }
-      },
-      receiver: {
-        _apply: function (user) { return user.getPublicView(); }
-      }
+      sender: true,
+      receiver: true
     }).then(function (b) {
       bookmark = b[0];
 
@@ -173,6 +169,16 @@ module.exports = function (app) {
           return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
         }
       });
+  };
+
+  /**
+   * Delete the specified group bookmark.
+   * 
+   * @param {String} bookmarkId The id of the bookmark to delete
+   * @return {Promise<Object>} The deleted bookmark
+   */
+  Service.deleteGroupBookmark = function (bookmarkId) {
+
   };
 
   return q({
