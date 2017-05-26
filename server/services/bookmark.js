@@ -238,7 +238,35 @@ module.exports = function (app) {
    * @return {Promise<Object>} The deleted bookmark
    */
   Service.deleteGroupBookmark = function (bookmarkId) {
+    var bookmark;
 
+    return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
+      sender: true,
+      receiver: true
+    }).then(function (b) {
+      bookmark = b[0];
+
+      if (bookmark) {
+        return Model.Bookmark.get(bookmarkId).update({ deletedAt: r.now() });
+      } else {
+        return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
+      }
+    }).then(function () {
+      return q.all([
+        Model.Group.get(bookmark.GroupId).update(function (group) {
+          return {
+            numBookmarks: group('numBookmarks').sub(1)
+          };
+        }),
+        Model.User.get(bookmark.SenderId).update(function (user) {
+          return {
+            numBookmarksCreated: user('numBookmarksCreated').sub(1)
+          };
+        })
+      ]);
+    }).then(function () {
+      return q(bookmark);
+    });
   };
 
   return q({
