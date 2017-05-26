@@ -19,4 +19,4 @@ module.exports = function (app) {
     // Load controllers
     return require('./controllers')(app);
   });
-}
+};

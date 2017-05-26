@@ -6,7 +6,7 @@ module.exports = function (app) {
   var Model = app.get('Model'),
       r = app.get('Thinky').r,
       Errors = app.get('Errors'),
-      Config =app.get('Config'),
+      Config = app.get('Config'),
       Service = {};
 
   /**

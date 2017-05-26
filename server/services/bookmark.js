@@ -6,6 +6,7 @@ module.exports = function (app) {
   var Model = app.get('Model'),
       r = app.get('Thinky').r,
       Errors = app.get('Errors'),
+      Config = app.get('Config'),
       Service = {};
 
   /**
@@ -18,14 +19,28 @@ module.exports = function (app) {
    */
   Service.createUserBookmark = function (senderId, receiverId, bookmark) {
     return app.get('Service').User.validateFriendship(senderId, receiverId, 'accepted').then(function () {
-      bookmark.SenderId = senderId;
-      bookmark.ReceiverId = receiverId;
-      delete bookmark.createdAt;
-      delete bookmark.deletedAt;
-      delete bookmark.id;
-      delete bookmark.GroupId;
+      return r.table(Model.User.getTableName()).get(senderId).update(function (user) {
+        return r.branch(
+          user('numBookmarksCreated').lt(Config.consts.MAX_USER_BOOKMARKS),
+          {
+            numBookmarksCreated: user('numBookmarksCreated').add(1)
+          },
+          {}  
+        );
+      });
+    }).then(function (res) {
+      if (res.replaced > 0) {
+        bookmark.SenderId = senderId;
+        bookmark.ReceiverId = receiverId;
+        delete bookmark.createdAt;
+        delete bookmark.deletedAt;
+        delete bookmark.id;
+        delete bookmark.GroupId;
 
-      return Model.Bookmark.save(bookmark);
+        return Model.Bookmark.save(bookmark);
+      } else {
+        return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of bookmarks'));
+      }
     });
   };
 
@@ -97,12 +112,8 @@ module.exports = function (app) {
     var bookmark;
 
     return Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).getJoin({
-      sender: {
-        _apply: function (user) { return user.getPublicView(); }
-      },
-      receiver: {
-        _apply: function (user) { return user.getPublicView(); }
-      }
+      sender: true,
+      receiver: true
     }).then(function (b) {
       bookmark = b[0];
 
@@ -112,9 +123,12 @@ module.exports = function (app) {
         return q.reject(new Errors.Db.EntityNotFound('Bookmark not found'));
       }
     }).then(function () {
-      // TODO WHY DOES .without NOT WORK FOR DATES
-      delete bookmark.sender.deletedAt;
-      delete bookmark.receiver.deletedAt;
+      return Model.User.get(bookmark.SenderId).update(function (user) {
+        return {
+          numBookmarksCreated: user('numBookmarksCreated').sub(1)
+        };
+      });
+    }).then(function () {
       return bookmark;
     });
   };
@@ -127,7 +141,7 @@ module.exports = function (app) {
    * @param {Object} bookmark The bookmark being shared
    * @return {Promise<Object>} The newly created bookmark
    */
-  Service.createGroupBookmark = function (senderId, groupId, bookmark){
+  Service.createGroupBookmark = function (senderId, groupId, bookmark) {
     bookmark.SenderId = senderId;
     bookmark.GroupId = groupId;
     delete bookmark.ReceiverId;
