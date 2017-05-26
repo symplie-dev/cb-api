@@ -142,14 +142,60 @@ module.exports = function (app) {
    * @return {Promise<Object>} The newly created bookmark
    */
   Service.createGroupBookmark = function (senderId, groupId, bookmark) {
-    bookmark.SenderId = senderId;
-    bookmark.GroupId = groupId;
-    delete bookmark.ReceiverId;
-    delete bookmark.createdAt;
-    delete bookmark.deletedAt;
-    delete bookmark.id;
+    // Sender and group are known to be valid since they passed through auth middleware
+    return q.all([
+      r.table(Model.Group.getTableName()).get(groupId).update(function (group) {
+        return r.branch(
+          group('numBookmarks').lt(Config.consts.MAX_GROUP_BOOKMARKS),
+          {
+            numBookmarks: group('numBookmarks').add(1)
+          },
+          {}  
+        );
+      }),
+      r.table(Model.User.getTableName()).get(senderId).update(function (user) {
+        return r.branch(
+          user('numBookmarksCreated').lt(Config.consts.MAX_USER_BOOKMARKS),
+          {
+            numBookmarksCreated: user('numBookmarksCreated').add(1)
+          },
+          {}  
+        );
+      })
+    ]).then(function (res) {
+      if (res[0].replaced > 0 && res[1].replaced > 0) {
+        // Both within their caps; all good
+        bookmark.SenderId = senderId;
+        bookmark.GroupId = groupId;
+        delete bookmark.ReceiverId;
+        delete bookmark.createdAt;
+        delete bookmark.deletedAt;
+        delete bookmark.id;
 
-    return Model.Bookmark.save(bookmark);
+        return Model.Bookmark.save(bookmark);
+      } else if (res[0].replaced > 0) {
+        // User outside of its cap; roll back group counter
+        return Model.Group.get(groupId).update(function (group) {
+          return {
+            numBookmarks: group('numBookmarks').sub(1)
+          };
+        }).then(function () {
+          return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of bookmarks.'));
+        });
+      } else if (res[1].replaced > 0) {
+        // Group outside of its cap; roll back user counter
+        return Model.Usr.get(senderId).update(function (user) {
+          return {
+            numBookmarksCreated: user('numBookmarksCreated').sub(1)
+          };
+        }).then(function () {
+          return q.reject(new Errors.Http.BadRequest('The group has reached the maximum number of bookmarks.'));
+        });
+      } else {
+        // Both outside of their caps
+        return q.reject(new Errors.Http.BadRequest('You and the group have reached the maximum number of bookmarks.'));
+      }
+    });
   };
 
   /**
