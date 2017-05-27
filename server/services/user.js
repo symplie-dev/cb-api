@@ -64,6 +64,38 @@ module.exports = function (app) {
   };
 
   /**
+   * Get a list of users that match the given search criteria
+   * 
+   * ```javascript
+   * var opts = {
+   *  username: 'test*'
+   * }
+   * ```
+   * 
+   * @param {Object} [opts] See example above
+   * @return {Promsie<Array<Object>>} The list of matching results
+   */
+  Service.search = function (opts) {
+    opts = opts || {};
+    opts.username = opts.username || '';
+
+    if (opts.username.length < Config.consts.search.MIN_USERNAME_LENGTH) {
+      return q.reject(new Errors.Http.BadRequest('username search parameter must be at least 3 characters'));
+    } else if (opts.username.length > Config.consts.search.MAX_USERNAME_LENGTH) {
+      return q.reject(new Errors.Http.BadRequest('username search parameter must at most 20 characters'));
+    } else {
+      return Model.User
+        .filter(
+          r.row('username').match('^' + opts.username + '.*').and(
+            r.row('deletedAt').eq(null)
+          )
+        )
+        .limit(Config.consts.search.MAX_RESULTS)
+        .orderBy('username');
+    }
+  };
+
+  /**
    * Update a user. Currently `username` is the only editable field.
    * 
    * @param {Object} user The id of the user to update

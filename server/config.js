@@ -26,7 +26,12 @@ module.exports = function () {
       MAX_GROUPS: 25,
       MAX_MEMBERSHIPS: 25,
       MAX_USER_BOOKMARKS: 100,
-      MAX_GROUP_BOOKMARKS: 100
+      MAX_GROUP_BOOKMARKS: 100,
+      search: {
+        MAX_RESULTS: 25,
+        MIN_USERNAME_LENGTH: 3,
+        MAX_USERNAME_LENGTH: 20
+      }
     },
     oauth: {
       CLIENT_ID: process.env.OAUTH_CLIENT_ID,
