@@ -4217,7 +4217,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete user1Group6 membersrhip (admin)",
+					"name": "Delete user1Group6 membership (admin)",
 					"event": [
 						{
 							"listen": "test",
@@ -4600,6 +4600,364 @@
 					],
 					"request": {
 						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks/{{idBookmark7}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify group bookmark count",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url'] = res.data.numBookmarks === 2;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete group1 bookmark6",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url property'] = typeof res.data.url === 'string';",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks/{{idBookmark6}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify group bookmark count pt1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url'] = res.data.numBookmarks === 1;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify bookmark6 deletion pt1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 404;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks/{{idBookmark6}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify bookmark6 deletion count pt2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url'] = res.data.length === 1;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete group1 bookmark7",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url property'] = typeof res.data.url === 'string';",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks/{{idBookmark7}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify group bookmark count pt2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url'] = res.data.numBookmarks === 0;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify bookmark7 deletion pt1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 404;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks/{{idBookmark7}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"group1\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Verify bookmark7 deletion count pt2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['Has correct url'] = res.data.length === 0;",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users/{{user1Id}}/groups/{{idGroup1}}/bookmarks",
 						"method": "GET",
 						"header": [
 							{

@@ -168,15 +168,22 @@ module.exports = function (app, router) {
     });
   
 
+  // Get a particular shared bookmark from a group
   // Delete a particular shared bookmark from a group
   router.route('/:actionUserId/groups/:groupId/bookmarks/:bookmarkId')
     .get(authorize.group.member, function (req, res) {
       Service.Bookmark.getGroupBookmark(req.params.bookmarkId).then(function (bookmark) {
         res.status(200).json({ status: 200, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
       });
     })
-    .delete(function (req, res) {
-      res.status(501).json({ status: 501, message: 'Not implemented' });
+    .delete(authorize.group.member, function (req, res) {
+      Service.Bookmark.deleteGroupBookmark(req.params.bookmarkId).then(function (bookmark) {
+        res.status(200).json({ status: 200, data: bookmark });
+      }).catch(function (err) {
+        res.status(err.status || 500).json(_errorResponse(err));
+      });
     });
   
   // Get all friends of a user
