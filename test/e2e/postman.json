@@ -4982,7 +4982,167 @@
 			]
 		},
 		{
-			"name": "8. Cleanup",
+			"name": "8. Search",
+			"description": "",
+			"item": [
+				{
+					"name": "Search users pt1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['contains list of matches'] = res.data.length === 4;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users?username=test",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": \"rejected\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Search users not enough chars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 400;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users?username=te",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": \"rejected\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Search users too many chars",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 400;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users?username=twolongofasearchquery",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": \"rejected\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Search users pt2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var res = JSON.parse(responseBody);",
+									"",
+									"tests['proper response code'] = responseCode.code === 200;",
+									"tests['contains list of matches'] = res.data.length === 1;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/api/users?username=test1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{tokenUser1}}",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"status\": \"rejected\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "9. Cleanup",
 			"description": "",
 			"item": [
 				{

@@ -18,7 +18,10 @@ module.exports = function (app, router) {
   // Create a new user
   router.route('/')
     .get(function (req, res) {
-      Service.User.search({ username: req.query.username }).then(function (users) {
+      Service.User.search({
+        username: req.query.username,
+        sub: req.query.sub
+      }).then(function (users) {
         return res.status(200).json({ status: 200, data: users });
       }).catch(function (err) {
         res.status(err.status || 500).json(_errorResponse(err));

@@ -77,21 +77,13 @@ module.exports = function (app) {
    */
   Service.search = function (opts) {
     opts = opts || {};
-    opts.username = opts.username || '';
 
-    if (opts.username.length < Config.consts.search.MIN_USERNAME_LENGTH) {
-      return q.reject(new Errors.Http.BadRequest('username search parameter must be at least 3 characters'));
-    } else if (opts.username.length > Config.consts.search.MAX_USERNAME_LENGTH) {
-      return q.reject(new Errors.Http.BadRequest('username search parameter must at most 20 characters'));
+    if (typeof opts.username === 'string') {
+      return _searchByUserName(opts.username);
+    } else if (typeof opts.sub === 'string') {
+      return _searchBySub(opts.sub);
     } else {
-      return Model.User
-        .filter(
-          r.row('username').match('^' + opts.username + '.*').and(
-            r.row('deletedAt').eq(null)
-          )
-        )
-        .limit(Config.consts.search.MAX_RESULTS)
-        .orderBy('username');
+      return q.reject(new Errors.Http.BadRequest('You must supply username or sub query options'));
     }
   };
 
@@ -218,80 +210,6 @@ module.exports = function (app) {
       }
     });
   };
-
-  function _acceptFriendship(friendship) {
-    return r.table(Model.Friendship.getTableName()).get(friendship.id).update(function (f) {
-      return r.branch(
-        f('status').eq('pending'),
-        {
-          acceptedAt: r.now(),
-          rejectedAt: null,
-          status: 'accepted'
-        },
-        {}
-      );
-    }).then(function (result) {
-      if (result.replaced > 0) {
-        return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
-          return r.branch(
-            user('numFriends').lt(Config.consts.MAX_FRIENDS),
-            {
-              numFriends: user('numFriends').add(1)
-            },
-            {}
-          );
-        });
-      } else {
-        return q.reject(new Errors.Http.BadRequest('Friendship already accepted/rejected'));
-      }
-    }).then(function (result) {
-      if (result.replaced > 0) {
-        return Model.Friendship.get(friendship.id);
-      } else {
-        // Roll back friendship status
-        return Model.Friendship.get(friendship.id).update({
-          status: 'pending',
-          acceptedAt: null
-        }).then(function () {
-          return q.reject(new Errors.Http.BadRequest('You\'ve already reached the maximum number of friends; unable to accept friendship'));
-        });
-      }
-    });
-    // return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
-    //   return r.branch(
-    //     user('numFriends').lt(Config.consts.MAX_FRIENDS),
-    //     {
-    //       acceptedAt: r.now(),
-    //       rejectedAt: null,
-    //       status: 'accepted'
-    //     },
-    //     {}
-    //   );
-    // }).then(function (result) {
-    //   if (result.replaced > 0) {
-    //     return Model.Friendship.get(friendship.id).update({
-
-    //     });
-    //   } else {
-    //     return q.reject(new Errors.Http.BadRequest('You have reached the maximum number of friends; unable to accept friendship'));
-    //   }
-    // });
-  }
-
-  function _rejectFriendship(friendship) {
-    // Free up the 
-    return Model.User.get(friendship.RequesterId).update(function (user) {
-      return {
-        numFriends: user('numFriends').sub(1)
-      };
-    }).then(function () {
-      return Model.Friendship.get(friendship.id).update({
-        rejectedAt: r.now(),
-        acceptedAt: null,
-        status: 'rejected'
-      });
-    });
-  }
 
   /**
    * Get all friends associated with the user.
@@ -455,4 +373,82 @@ module.exports = function (app) {
     name: 'User',
     service: Service
   });
+
+  /* Private functions
+  ---------------------------------------------------------------------------------------------- */
+
+  function _acceptFriendship(friendship) {
+    return r.table(Model.Friendship.getTableName()).get(friendship.id).update(function (f) {
+      return r.branch(
+        f('status').eq('pending'),
+        {
+          acceptedAt: r.now(),
+          rejectedAt: null,
+          status: 'accepted'
+        },
+        {}
+      );
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
+          return r.branch(
+            user('numFriends').lt(Config.consts.MAX_FRIENDS),
+            {
+              numFriends: user('numFriends').add(1)
+            },
+            {}
+          );
+        });
+      } else {
+        return q.reject(new Errors.Http.BadRequest('Friendship already accepted/rejected'));
+      }
+    }).then(function (result) {
+      if (result.replaced > 0) {
+        return Model.Friendship.get(friendship.id);
+      } else {
+        // Roll back friendship status
+        return Model.Friendship.get(friendship.id).update({
+          status: 'pending',
+          acceptedAt: null
+        }).then(function () {
+          return q.reject(new Errors.Http.BadRequest('You\'ve already reached the maximum number of friends; unable to accept friendship'));
+        });
+      }
+    });
+  }
+
+  function _rejectFriendship(friendship) {
+    return Model.User.get(friendship.RequesterId).update(function (user) {
+      return {
+        numFriends: user('numFriends').sub(1)
+      };
+    }).then(function () {
+      return Model.Friendship.get(friendship.id).update({
+        rejectedAt: r.now(),
+        acceptedAt: null,
+        status: 'rejected'
+      });
+    });
+  }
+
+  function _searchByUserName(username) {
+    if (username.length < Config.consts.search.MIN_USERNAME_LENGTH) {
+      return q.reject(new Errors.Http.BadRequest('username search parameter must be at least 3 characters'));
+    } else if (username.length > Config.consts.search.MAX_USERNAME_LENGTH) {
+      return q.reject(new Errors.Http.BadRequest('username search parameter must at most 20 characters'));
+    } else {
+      return Model.User
+        .filter(
+          r.row('username').match('^' + username + '.*').and(
+            r.row('deletedAt').eq(null)
+          )
+        )
+        .limit(Config.consts.search.MAX_RESULTS)
+        .orderBy('username');
+    }
+  }
+
+  function _searchBySub(sub) {
+    return Model.User.getAll(sub, { index: 'sub' }).filter({ deletedAt: null });
+  }
 };
