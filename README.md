@@ -130,7 +130,7 @@ Currently the CB API only supports JSON data formatting.
 | `data[i].numBookmarksCreated` | `Number` | The number of bookmarks a user has created                    |
 | `data[i].createdAt`           | `String` | The ISO date string when the user was created                 |
 
-* Get -- `GET` `/api/users/:userId`
+* `GET` `/api/users/:userId` --  Get a specific user
 
 **Request Headers**
 
