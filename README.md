@@ -65,6 +65,7 @@ Currently the CB API only supports JSON data formatting.
 * `POST` `/api/users` -- Create a new user.
 
 **Request Headers**
+
 | Property Name   | Description                                             |
 |:----------------|:--------------------------------------------------------|
 | `Authorization` | `Bearer <Chrome Identity Token>` OR `Basic <user/pass>` |
@@ -97,6 +98,13 @@ Currently the CB API only supports JSON data formatting.
 * `GET` `/api/users` -- Get a list of users that match the given query params. The query parameters
   are required and must be at least three characters long to prevent returning too many results.
 
+**Request Headers**
+
+| Property Name   | Description                                             |
+|:----------------|:--------------------------------------------------------|
+| `Authorization` | `Bearer <Chrome Identity Token>` OR `Basic <user/pass>` |
+| `Content-Type`  | `application/json`                                      |
+
 **Request Body**
 
 `N/A`
@@ -123,6 +131,13 @@ Currently the CB API only supports JSON data formatting.
 | `data[i].createdAt`           | `String` | The ISO date string when the user was created                 |
 
 * Get -- `GET` `/api/users/:userId`
+
+**Request Headers**
+
+| Property Name   | Description                                             |
+|:----------------|:--------------------------------------------------------|
+| `Authorization` | `Bearer <Chrome Identity Token>` OR `Basic <user/pass>` |
+| `Content-Type`  | `application/json`                                      |
 
 **Request Body**
 
