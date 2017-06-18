@@ -4,9 +4,8 @@ Server-side API for collaborative bookmarks.
 
 ## Description
 
-Collaborative Bookmarks or CB for short allows users to create and manage
-lists of shared bookmarks. CB bookmarks can be shared directly user-to-user or
-shared with a group of other users.
+Collaborative Bookmarks or CB for short allows users to create and manage lists of shared
+bookmarks. CB bookmarks can be shared directly user-to-user or shared with a group of other users.
 
 ### Environment Variables
 
@@ -30,10 +29,8 @@ shared with a group of other users.
 
 ##### Install and run RethinkDB
 
-1. Go to the RethinkDB installation [page][0] and install RethinkDB for your
-  platform.
-2. Start your local instance of rethink: `rethinkdb` or `rethinkdb.exe` on
-  Windows
+1. Go to the RethinkDB installation [page][0] and install RethinkDB for your platform.
+2. Start your local instance of rethink: `rethinkdb` or `rethinkdb.exe` on Windows
 
 ##### Install cb-api
 
@@ -55,6 +52,99 @@ _Note: This assumes you have node v4.x or higher installed_
 ##### Unit
 
 `TODO`
+
+---
+
+## API Documentation
+
+The CB API follows a nested RESTful pattern where the context for most calls is the `user` entitiy.
+Currently the CB API only supports JSON data formatting.
+
+### Users
+
+* `POST` `/api/users` -- Create a new user.
+
+**Request Headers**
+| Property Name   | Description                                             |
+|:----------------|:--------------------------------------------------------|
+| `Authorization` | `Bearer <Chrome Identity Token>` OR `Basic <user/pass>` |
+| `Content-Type`  | `application/json`                                      |
+
+**Request Body**
+
+| Property Name   | Type     | Description                             |
+|:----------------|:---------|:----------------------------------------|
+| `username`      | `String` | The username for the user to be created |
+
+**Query Params**
+
+`N/A`
+
+**Response Body**
+
+| Property Name              | Type     | Description                                                   |
+|:---------------------------|:---------|:--------------------------------------------------------------|
+| `status`                   | `Number` | The HTTP return status code                                   |
+| `data`                     | `Object` | The newly created user                                        |
+| `data.username`            | `String` | The username                                                  |
+| `data.id`                  | `String` | The unique ID of the user                                     |
+| `data.numFriends`          | `Number` | The number of friends a user has                              |
+| `data.numGroupsCreated`    | `Number` | The number of groups the user has created                     |
+| `data.numMemberships`      | `Number` | The number of groups the user is a member of                  |
+| `data.numBookmarksCreated` | `Number` | The number of bookmarks a user has created                    |
+| `data.createdAt`           | `String` | The ISO date string when the user was created                 |
+
+* `GET` `/api/users` -- Get a list of users that match the given query params. The query parameters
+  are required and must be at least three characters long to prevent returning too many results.
+
+**Request Body**
+
+`N/A`
+
+**Query Params**
+
+| Property Name   | Description                                      |
+|:----------------|:-------------------------------------------------|
+| `username`      | Used to search by username; ses prefix matching. |
+| `sub`           | Search by sub (full match only)                  |
+
+**Response Body**
+
+| Property Name                 | Type     | Description                                                   |
+|:------------------------------|:---------|:--------------------------------------------------------------|
+| `status`                      | `Number` | The HTTP return status code                                   |
+| `data`                        | `Array`  | An array of the matching results                              |
+| `data[i].username`            | `String` | The username                                                  |
+| `data[i].id`                  | `String` | The unique ID of the user                                     |
+| `data[i].numFriends`          | `Number` | The number of friends a user has                              |
+| `data[i].numGroupsCreated`    | `Number` | The number of groups the user has created                     |
+| `data[i].numMemberships`      | `Number` | The number of groups the user is a member of                  |
+| `data[i].numBookmarksCreated` | `Number` | The number of bookmarks a user has created                    |
+| `data[i].createdAt`           | `String` | The ISO date string when the user was created                 |
+
+* Get -- `GET` `/api/users/:userId`
+
+**Request Body**
+
+`N/A`
+
+**Query Params**
+
+`N/A`
+
+**Response Body**
+
+| Property Name              | Type     | Description                                   |
+|:---------------------------|:---------|:----------------------------------------------|
+| `status`                   | `Number` | The HTTP return status code                   |
+| `data`                     | `Object` | The user                                      |
+| `data.username`            | `String` | The username                                  |
+| `data.id`                  | `String` | The unique ID of the user                     |
+| `data.numFriends`          | `Number` | The number of friends a user has              |
+| `data.numGroupsCreated`    | `Number` | The number of groups the user has created     |
+| `data.numMemberships`      | `Number` | The number of groups the user is a member of  |
+| `data.numBookmarksCreated` | `Number` | The number of bookmarks a user has created    |
+| `data.createdAt`           | `String` | The ISO date string when the user was created |
 
 
 
