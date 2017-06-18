@@ -390,15 +390,16 @@ module.exports = function (app) {
       );
     }).then(function (result) {
       if (result.replaced > 0) {
-        return r.table(Model.User.getTableName()).get(friendship.RequestedId).update(function (user) {
-          return r.branch(
-            user('numFriends').lt(Config.consts.MAX_FRIENDS),
-            {
-              numFriends: user('numFriends').add(1)
-            },
-            {}
-          );
-        });
+        return r.table(Model.User.getTableName()).get(friendship.RequestedId)
+          .update(function (user) {
+            return r.branch(
+              user('numFriends').lt(Config.consts.MAX_FRIENDS),
+              {
+                numFriends: user('numFriends').add(1)
+              },
+              {}
+            );
+          });
       } else {
         return q.reject(new Errors.Http.BadRequest('Friendship already accepted/rejected'));
       }

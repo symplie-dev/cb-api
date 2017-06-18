@@ -171,11 +171,12 @@ module.exports = function (app, router) {
       });
     })
     .post(authorize.group.member, function (req, res) {
-      Service.Bookmark.createGroupBookmark(req.params.actionUserId, req.params.groupId, req.body).then(function (bookmark) {
-        res.status(201).json({ status: 201, data: bookmark });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.Bookmark.createGroupBookmark(req.params.actionUserId, req.params.groupId, req.body)
+        .then(function (bookmark) {
+          res.status(201).json({ status: 201, data: bookmark });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     });
   
 
@@ -213,25 +214,28 @@ module.exports = function (app, router) {
   // Remove friendship
   router.route('/:actionUserId/friends/:bUserId')
     .post(function (req, res) {
-      Service.User.createFriendship(req.params.actionUserId, req.params.bUserId).then(function (friendship) {
-        res.status(201).json({ status: 201, data: friendship });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.User.createFriendship(req.params.actionUserId, req.params.bUserId)
+        .then(function (friendship) {
+          res.status(201).json({ status: 201, data: friendship });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     })
     .put(function (req, res) {
-      Service.User.updateFriendship(req.params.actionUserId, req.params.bUserId, req.body.status).then(function (friendship) {
-        res.status(200).json({ status: 200, data: friendship });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.User.updateFriendship(req.params.actionUserId, req.params.bUserId, req.body.status)
+        .then(function (friendship) {
+          res.status(200).json({ status: 200, data: friendship });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     })
     .delete(function (req, res) {
-      Service.User.deleteFriendship(req.params.actionUserId, req.params.bUserId).then(function (friendship) {
-        res.status(200).json({ status: 200, data: friendship });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.User.deleteFriendship(req.params.actionUserId, req.params.bUserId)
+        .then(function (friendship) {
+          res.status(200).json({ status: 200, data: friendship });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     });
 
   // Get all bookmarks shared with a particular friend
@@ -239,18 +243,20 @@ module.exports = function (app, router) {
   // Delete a shared bookmark with a friend
   router.route('/:actionUserId/friends/:friendId/bookmarks')
     .get(function (req, res) {
-      Service.Bookmark.getUserBookmarks(req.params.actionUserId, req.params.friendId).then(function (bookmarks) {
-        res.status(200).json({ status: 200, data: bookmarks });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.Bookmark.getUserBookmarks(req.params.actionUserId, req.params.friendId)
+        .then(function (bookmarks) {
+          res.status(200).json({ status: 200, data: bookmarks });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     })
     .post(function (req, res) {
-      Service.Bookmark.createUserBookmark(req.params.actionUserId, req.params.friendId, req.body).then(function (bookmark) {
-        res.status(201).json({ status: 201, data: bookmark });
-      }).catch(function (err) {
-        res.status(err.status || 500).json(_errorResponse(err));
-      });
+      Service.Bookmark.createUserBookmark(req.params.actionUserId, req.params.friendId, req.body)
+        .then(function (bookmark) {
+          res.status(201).json({ status: 201, data: bookmark });
+        }).catch(function (err) {
+          res.status(err.status || 500).json(_errorResponse(err));
+        });
     });
   
   // Get a particular bookmark shared with a particular friend

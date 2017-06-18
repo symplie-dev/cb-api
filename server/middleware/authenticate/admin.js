@@ -11,7 +11,11 @@ module.exports = function (app) {
       var credentials = ba(req),
           reqIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
  
-      if (!credentials || credentials.name !== Config.admin.USER || credentials.pass !== Config.admin.PASS) {
+      if (
+        !credentials ||
+        credentials.name !== Config.admin.USER ||
+        credentials.pass !== Config.admin.PASS
+      ) {
         Logger.warn('%s attempted unauthenticated admin request', reqIp);
         res.statusCode = 401;
         res.setHeader('WWW-Authenticate', 'Basic');

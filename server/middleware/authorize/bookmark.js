@@ -29,7 +29,11 @@ module.exports = function (app) {
         });
       } else {
         Model.Bookmark.getAll(bookmarkId).filter({ deletedAt: null }).then(function (bookmark) {
-          if (bookmark && bookmark.SenderId === actionUserId || bookmark.ReceiverId === actionUserId) {
+          if (
+            bookmark &&
+            bookmark.SenderId === actionUserId ||
+            bookmark.ReceiverId === actionUserId
+          ) {
             next();
           } else {
             Logger.error('%s - %s attempted action on unaffiliated bookmark %s', reqIp, actionUserId, bookmarkId);
