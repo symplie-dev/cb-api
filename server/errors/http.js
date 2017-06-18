@@ -16,4 +16,11 @@ errors.BadRequest = function CustomError(message) {
   this.status = errors.Const.BadRequest.STATUS;
 };
 
+errors.InternalServerError = function InternalServerError(message) {
+  Error.captureStackTrace(this, this.constructor);
+  this.name = this.constructor.name;
+  this.message = message || errors.Const.InternalServerError.MESSAGE;
+  this.status = errors.Const.InternalServerError.STATUS;
+};
+
 module.exports = errors;
